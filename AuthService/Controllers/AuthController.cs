@@ -31,11 +31,7 @@ namespace AuthService.Controllers
             try
             {
                 // Generate JWT token
-                var identityUser = await _accountService.FindByEmailAsync(account.Email);
-
-                var principal = await _accountService.CreateUserPrincipalAsync(identityUser);
-
-                string jwt = _jwtService.GenerateJwtToken(principal.Claims);
+                string jwt = await GenerateJWT(account.Email);
 
                 // Success logged in
                 return Ok(new { success = true, message = "User logged in successfully!", result = jwt });
@@ -60,8 +56,11 @@ namespace AuthService.Controllers
                     return BadRequest(new { success = false, message = registerResult.Errors.FirstOrDefault()?.Description });
                 }
 
+                // Generate JWT token
+                string jwt = await GenerateJWT(account.Email);
+
                 // Success register
-                return Ok(new { success = true, message = "User registered successfully!" });
+                return Ok(new { success = true, message = "User registered successfully!", result = jwt });
             }
 
             catch
@@ -164,6 +163,16 @@ namespace AuthService.Controllers
         {
             await _accountService.SignOutAsync();
             return Ok(new { success = true, message = "User logged out successfully!" });
+        }
+
+        private async Task<string> GenerateJWT(string email)
+        {
+            // Generate JWT token
+            var identityUser = await _accountService.FindByEmailAsync(email);
+
+            var principal = await _accountService.CreateUserPrincipalAsync(identityUser);
+
+            return _jwtService.GenerateJwtToken(principal.Claims);
         }
 
     }
