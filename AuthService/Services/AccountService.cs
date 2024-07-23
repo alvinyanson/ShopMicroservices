@@ -51,8 +51,6 @@ namespace AuthService.Services
 
         public async Task<IdentityResult> RegisterAsync(RegisterAccount registerAccount)
         {
-            ArgumentNullException.ThrowIfNull(registerAccount);
-
             var identityUser = _mapper.Map<IdentityUser>(registerAccount);
 
             var identityRole = new IdentityRole { Name = registerAccount.Role };
