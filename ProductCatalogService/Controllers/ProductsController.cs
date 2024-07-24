@@ -23,49 +23,51 @@ namespace ProductCatalogService.Controllers
 
         // GET: api/<ProductController>
         [HttpGet]
-        public ActionResult<IEnumerable<Product>> GetProducts()
+        public ActionResult<string> GetProducts()
         {
             var results = _unitOfWork.Product.GetAll();
-            return Ok(new { success = true, message = "Products retrieved!", result = results });
+
+            return Ok(new { success = true, message = "Products retrieved!", results });
         }
 
         // GET api/<ProductController>/5
         [HttpGet("{id}")]
-        public ActionResult<IEnumerable<Product>> GetProduct(int id)
+        public ActionResult<string> GetProduct(int id)
         {
             var result = _unitOfWork.Product.Get(u => u.Id == id);
-            return Ok(new { success = true, message = "Product retrieved!", result = result });
+
+            return Ok(new { success = true, message = "Product retrieved!", result });
         }
 
-        // POST api/<ProductController>
         [HttpPost]
-        public ActionResult<Product> AddProduct(ProductCreateDto productCreateDto)
+        public ActionResult<string> AddProduct(ProductCreateDto productCreateDto)
         {
             var product = _mapper.Map<Product>(productCreateDto);
 
             _unitOfWork.Product.Add(product);
+
             _unitOfWork.Save();
 
             return Ok(new { success = true, message = "Product created!" });
         }
 
-        // PUT api/<ProductController>/5
         [HttpPut]
-        public ActionResult<Product> UpdateProduct(ProductUpdateDto productUpdateDto)
+        public ActionResult<string> UpdateProduct(ProductUpdateDto productUpdateDto)
         {
             var product = _mapper.Map<Product>(productUpdateDto);
 
             _unitOfWork.Product.Update(product);
+
             _unitOfWork.Save();
 
             return Ok(new { success = true, message = "Product updated!" });
         }
 
-        // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
-        public ActionResult<Product> Delete(int id)
+        public ActionResult<string> Delete(int id)
         {
             _unitOfWork.Product.Remove(id);
+
             _unitOfWork.Save();
 
             return Ok(new { success = true, message = "Product deleted!" });

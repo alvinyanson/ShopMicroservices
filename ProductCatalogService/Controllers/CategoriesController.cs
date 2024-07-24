@@ -23,51 +23,51 @@ namespace ProductCatalogService.Controllers
         }
 
 
-        // GET: api/<CategoriesController>
         [HttpGet]
-        public ActionResult<IEnumerable<Category>> GetCategories()
+        public ActionResult<string> GetCategories()
         {
             var results = _unitOfWork.Category.GetAll();
-            return Ok(new { success = true, message = "Categories retrieved!", result = results });
+
+            return Ok(new { success = true, message = "Categories retrieved!", results });
         }
 
-        // GET api/<CategoriesController>/5
         [HttpGet("{id}")]
-        public ActionResult<IEnumerable<Product>> GetCategory(int id)
+        public ActionResult<string> GetCategory(int id)
         {
             var result = _unitOfWork.Category.Get(u => u.Id == id);
-            return Ok(new { success = true, message = "Category retrieved!", result = result });
+
+            return Ok(new { success = true, message = "Category retrieved!", result });
         }
 
-        // POST api/<CategoriesController>
         [HttpPost]
-        public ActionResult<Category> AddCategory(CategoryCreateDto categoryCreateDto)
+        public ActionResult<string> AddCategory(CategoryCreateDto categoryCreateDto)
         {
             var category = _mapper.Map<Category>(categoryCreateDto);
 
             _unitOfWork.Category.Add(category);
+
             _unitOfWork.Save();
 
             return Ok(new { success = true, message = "Category created!" });
         }
 
-        // PUT api/<CategoriesController>/5
         [HttpPut]
-        public ActionResult<Category> UpdateCategory(CategoryUpdateDto categoryUpdateDto)
+        public ActionResult<string> UpdateCategory(CategoryUpdateDto categoryUpdateDto)
         {
             var category = _mapper.Map<Category>(categoryUpdateDto);
 
             _unitOfWork.Category.Update(category);
+
             _unitOfWork.Save();
 
             return Ok(new { success = true, message = "Category updated!" });
         }
 
-        // DELETE api/<CategoriesController>/5
         [HttpDelete("{id}")]
-        public ActionResult<Category> Delete(int id)
+        public ActionResult<string> Delete(int id)
         {
             _unitOfWork.Category.Remove(id);
+
             _unitOfWork.Save();
 
             return Ok(new { success = true, message = "Category deleted!" });

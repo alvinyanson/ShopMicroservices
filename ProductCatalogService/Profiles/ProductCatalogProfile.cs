@@ -14,6 +14,9 @@ namespace ProductCatalogService.Profiles
 
             CreateMap<CategoryCreateDto, Category>();
             CreateMap<CategoryUpdateDto, Category>();
+
+
+            CreateMap<AddToCartDto, Cart>();
         }
     }
 }

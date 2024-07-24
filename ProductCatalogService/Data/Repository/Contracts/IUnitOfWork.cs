@@ -6,6 +6,8 @@
 
         ICategoryRepository Category { get; }
 
+        ICartRepository Cart { get; }
+
         void Save();
     }
 }
