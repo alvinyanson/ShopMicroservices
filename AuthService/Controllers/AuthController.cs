@@ -2,6 +2,8 @@
 using AuthService.Services;
 using AuthService.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace AuthService.Controllers
 {
@@ -155,6 +157,24 @@ namespace AuthService.Controllers
             {
                 return StatusCode(500, new { success = false, message = $"Internal server error!" });
             }
+        }
+
+        [HttpGet(nameof(GetUserId))]
+        public ActionResult<string> GetUserId(string token)
+        {
+            string splitToken = token.ToString().Split(' ', 2)[1];
+
+            var handler = new JwtSecurityTokenHandler();
+            
+            var jsonToken = handler.ReadJwtToken(splitToken);
+
+            if (jsonToken is null)
+            {
+                return Unauthorized();
+            }
+
+            string id = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? default!;
+            return id;
         }
 
 

@@ -2,11 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using ProductCatalogService.Data;
 using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Data.Repository;
+using ProductCatalogService.SyncDataServices.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddTransient<ICommandDataClient, CommandDataClient>();
 
 
 var app = builder.Build();
