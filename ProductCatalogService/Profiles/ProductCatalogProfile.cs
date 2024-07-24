@@ -10,6 +10,10 @@ namespace ProductCatalogService.Profiles
         {
             CreateMap<ProductCreateDto, Product>();
             CreateMap<ProductUpdateDto, Product>();
+
+
+            CreateMap<CategoryCreateDto, Category>();
+            CreateMap<CategoryUpdateDto, Category>();
         }
     }
 }
