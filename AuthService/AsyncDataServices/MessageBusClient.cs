@@ -1,8 +1,9 @@
-﻿using RabbitMQ.Client;
+﻿using AuthService.Dtos;
+using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
 
-namespace ProductCatalogService.AsyncDataServices
+namespace AuthService.AsyncDataServices
 {
     public class MessageBusClient : IMessageBusClient
     {
@@ -41,12 +42,16 @@ namespace ProductCatalogService.AsyncDataServices
             }
         }
 
-        public void UserSignUp(string email)
+        public void UserSignUp(UserSignUpDto userSignUpDto)
         {
+            var message = JsonSerializer.Serialize(userSignUpDto);
+
+            Console.WriteLine($"messagebus {message}");
+
             if (_connection.IsOpen)
             {
                 Console.WriteLine("RabbitMQ connection open, sending message...");
-                SendMessage(email);
+                SendMessage(message);
             }
             else
             {

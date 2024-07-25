@@ -1,4 +1,5 @@
-﻿using AuthService.Models;
+﻿using AuthService.Dtos;
+using AuthService.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
@@ -10,7 +11,10 @@ namespace AuthService.Profiles
         {
             CreateMap<RegisterAccount, IdentityUser>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email)); ;
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+
+
+            CreateMap<RegisterAccount, UserSignUpDto>();
         }
     }
 }

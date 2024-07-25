@@ -1,6 +1,9 @@
-﻿using AuthService.Models;
+﻿using AuthService.AsyncDataServices;
+using AuthService.Dtos;
+using AuthService.Models;
 using AuthService.Services;
 using AuthService.Services.Contracts;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -13,11 +16,19 @@ namespace AuthService.Controllers
     {
         private readonly IAccountService _accountService;
         private readonly JWTService _jwtService;
+        private readonly IMessageBusClient _messageBusClient;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAccountService accountService, JWTService jwtService)
+        public AuthController(
+            IAccountService accountService, 
+            JWTService jwtService, 
+            IMessageBusClient messageBusClient,
+            IMapper mapper)
         {
             _accountService = accountService;
             _jwtService = jwtService;
+            _messageBusClient = messageBusClient;
+            _mapper = mapper;
         }
 
         [HttpPost(nameof(Login))]
@@ -51,6 +62,7 @@ namespace AuthService.Controllers
         {
             try
             {
+
                 var registerResult = await _accountService.RegisterAsync(account);
 
                 if (!registerResult.Succeeded)
@@ -60,6 +72,9 @@ namespace AuthService.Controllers
 
                 // Generate JWT token
                 string jwt = await GenerateJWT(account.Email);
+
+                var userSignUpDto = _mapper.Map<UserSignUpDto>(account);
+                _messageBusClient.UserSignUp(userSignUpDto);
 
                 // Success register
                 return Ok(new { success = true, message = "User registered successfully!", result = jwt });

@@ -3,6 +3,7 @@ using AuthService.Services.Contracts;
 using AuthService.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AuthService.AsyncDataServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 // services
 builder.Services.AddTransient<JWTService>();
+builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
 builder.Services.AddTransient<IAccountService, AccountService>();
 
 var app = builder.Build();

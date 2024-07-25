@@ -3,6 +3,8 @@ using ProductCatalogService.Data;
 using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Data.Repository;
 using ProductCatalogService.SyncDataServices.Http;
+using ProductCatalogService.EventProcessing;
+using ProductCatalogService.AsyncDataServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +29,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<ICommandDataClient, CommandDataClient>();
-
+builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+builder.Services.AddHostedService<MesageBusSubscriber>();
 
 var app = builder.Build();
 
