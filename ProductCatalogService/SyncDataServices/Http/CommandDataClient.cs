@@ -12,6 +12,8 @@ namespace ProductCatalogService.SyncDataServices.Http
             _configuration = configuration;
         }
 
+
+
         public async Task<string> GetId(string token)
         {
             using (HttpClient client = new HttpClient())
@@ -27,6 +29,25 @@ namespace ProductCatalogService.SyncDataServices.Http
                 else
                 {
                     Console.WriteLine("Sync GET to AuthService was FAILED");
+                    return string.Empty;
+                }
+            }
+        }
+
+        public async Task<string> TestConnection()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/TestConnection");
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Sync GET to TestConnection was OK");
+                    string message = await response.Content.ReadAsStringAsync();
+                    return message;
+                }
+                else
+                {
+                    Console.WriteLine("Sync GET to TestConnection was FAILED");
                     return string.Empty;
                 }
             }

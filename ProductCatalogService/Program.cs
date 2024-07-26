@@ -29,10 +29,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<ICommandDataClient, CommandDataClient>();
-builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
-builder.Services.AddHostedService<MesageBusSubscriber>();
+//builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+//builder.Services.AddHostedService<MesageBusSubscriber>();
 
 var app = builder.Build();
+
+PrepDb.PrepPopulation(app, builder.Environment.IsProduction());
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

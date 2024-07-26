@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-catalog-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productcatalog
+  template:
+    metadata:
+      labels:
+        app: productcatalog
+    spec:
+      containers:
+        - name: productcatalog
+          image: ayansonarcanys/productcatalog:latest
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-catalog-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: productcatalog
+  ports:
+    - name: productcatalog
+      protocol: TCP
+      port: 8080
+      targetPort: 8080

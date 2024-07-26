@@ -105,6 +105,14 @@ namespace ProductCatalogService.Controllers
             return Ok(new { success = true, message = "Item deleted from cart!" });
         }
 
+        [HttpGet(nameof(TestConnection))]
+        public async Task<ActionResult<string>> TestConnection()
+        {
+            var message = await _commandDataClient.TestConnection();
+
+            return Ok(message);
+        }
+
         private async Task<string> GetUserIdFromHeader()
         {
             var request = _contextAccessor.HttpContext?.Request;

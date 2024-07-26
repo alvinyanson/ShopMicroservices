@@ -3,5 +3,7 @@
     public interface ICommandDataClient
     {
         Task<string> GetId(string token);
+
+        Task<string> TestConnection();
     }
 }

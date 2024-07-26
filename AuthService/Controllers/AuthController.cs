@@ -1,4 +1,4 @@
-﻿using AuthService.AsyncDataServices;
+﻿//using AuthService.AsyncDataServices;
 using AuthService.Dtos;
 using AuthService.Models;
 using AuthService.Services;
@@ -16,18 +16,18 @@ namespace AuthService.Controllers
     {
         private readonly IAccountService _accountService;
         private readonly JWTService _jwtService;
-        private readonly IMessageBusClient _messageBusClient;
+        //private readonly IMessageBusClient _messageBusClient;
         private readonly IMapper _mapper;
 
         public AuthController(
             IAccountService accountService, 
             JWTService jwtService, 
-            IMessageBusClient messageBusClient,
+            //IMessageBusClient messageBusClient,
             IMapper mapper)
         {
             _accountService = accountService;
             _jwtService = jwtService;
-            _messageBusClient = messageBusClient;
+            //_messageBusClient = messageBusClient;
             _mapper = mapper;
         }
 
@@ -73,8 +73,8 @@ namespace AuthService.Controllers
                 // Generate JWT token
                 string jwt = await GenerateJWT(account.Email);
 
-                var userSignUpDto = _mapper.Map<UserSignUpDto>(account);
-                _messageBusClient.UserSignUp(userSignUpDto);
+                //var userSignUpDto = _mapper.Map<UserSignUpDto>(account);
+                //_messageBusClient.UserSignUp(userSignUpDto);
 
                 // Success register
                 return Ok(new { success = true, message = "User registered successfully!", result = jwt });
@@ -193,6 +193,13 @@ namespace AuthService.Controllers
         }
 
 
+        [HttpGet(nameof(TestConnection))]
+        public ActionResult<string> TestConnection()
+        {
+            return Ok("Connection established...");
+        }
+
+
         [HttpPost(nameof(Logout))]
         public async Task<ActionResult> Logout()
         {
@@ -209,6 +216,9 @@ namespace AuthService.Controllers
 
             return _jwtService.GenerateJwtToken(principal.Claims);
         }
+
+
+
 
     }
 }

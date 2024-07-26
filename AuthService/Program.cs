@@ -40,10 +40,12 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 // services
 builder.Services.AddTransient<JWTService>();
-builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
+//builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
 builder.Services.AddTransient<IAccountService, AccountService>();
 
 var app = builder.Build();
+
+PrepDb.PrepPopulation(app, builder.Environment.IsProduction());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

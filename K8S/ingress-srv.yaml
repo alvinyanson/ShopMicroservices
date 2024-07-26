@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-srv
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+    - host: shopme.com
+      http:
+        paths:
+          - path: /api/Auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-clusterip-srv
+                port:
+                  number: 8080
+          - path: /api/Products
+            pathType: Prefix
+            backend:
+              service:
+                name: product-catalog-clusterip-srv
+                port:
+                  number: 8080
+          - path: /api/Categories
+            pathType: Prefix
+            backend:
+              service:
+                name: product-catalog-clusterip-srv
+                port:
+                  number: 8080
+          - path: /api/Carts
+            pathType: Prefix
+            backend:
+              service:
+                name: product-catalog-clusterip-srv
+                port:
+                  number: 8080
+                  
