@@ -1,35 +1,53 @@
 ﻿
-using Microsoft.Extensions.Configuration;
 
 namespace ProductCatalogService.SyncDataServices.Http
 {
-    public class CommandDataClient : ICommandDataClient
+    public class HttpComms : IHttpComms
     {
         private readonly IConfiguration _configuration;
 
-        public CommandDataClient(IConfiguration configuration)
+        public HttpComms(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-
-
-        public async Task<string> GetId(string token)
+        public async Task<string> GetUserId(string token)
         {
             using (HttpClient client = new HttpClient())
             {
                 var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/GetUserId?token={token}");
-                Console.WriteLine($"{_configuration.GetConnectionString("AuthService")}/GetUserId?token={token}");
                 if (response.IsSuccessStatusCode)
                 {
-                    string id = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Sync GET to AuthService was OK");
-                    return id;
+                    return await response.Content.ReadAsStringAsync();
                 }
                 else
                 {
-                    Console.WriteLine("Sync GET to AuthService was FAILED");
                     return string.Empty;
+                }
+            }
+        }
+
+        public async Task<bool> IsTokenValid(string token)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/isTokenValid?token={token}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                   
+                    if(result != null)
+                    {
+                        return bool.TryParse(result, out bool res);
+                    }
+                    
+                    return false;
+
+                }
+                else
+                {
+                    return false;
                 }
             }
         }

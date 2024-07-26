@@ -5,5 +5,7 @@ namespace AuthService.Services.Contracts
     public interface IJWTService
     {
         string GenerateJwtToken(IEnumerable<Claim> claims);
+
+        bool ValidateJwtToken(string token);
     }
 }

@@ -5,6 +5,8 @@ using AuthService.Services;
 using AuthService.Services.Contracts;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace AuthService.Controllers
 {
@@ -15,14 +17,14 @@ namespace AuthService.Controllers
         private readonly IHttpContextHelper _httpContextHelper;
         private readonly IMessageBusClient _messageBusClient;
         private readonly IAccountService _accountService;
-        private readonly JWTService _jwtService;
+        private readonly IJWTService _jwtService;
         private readonly IMapper _mapper;
 
         public AuthController(
             IHttpContextHelper httpContextHelper,
             IMessageBusClient messageBusClient,
             IAccountService accountService, 
-            JWTService jwtService,
+            IJWTService jwtService,
             IMapper mapper)
         {
             _httpContextHelper = httpContextHelper;
@@ -132,7 +134,7 @@ namespace AuthService.Controllers
             try
             {
                 // Check if token is valid
-                string token = _httpContextHelper.GetBearerTokenFromHeaders();
+                string token = _httpContextHelper.GetTokenFromHeaders();
                 bool isValidToken = _jwtService.ValidateJwtToken(token);
 
                 if (string.IsNullOrEmpty(token) || !isValidToken)
@@ -177,7 +179,7 @@ namespace AuthService.Controllers
             try
             {
                 // Check if token is valid
-                string token = _httpContextHelper.GetBearerTokenFromHeaders();
+                string token = _httpContextHelper.GetTokenFromHeaders();
                 bool isValidToken = _jwtService.ValidateJwtToken(token);
 
                 if (string.IsNullOrEmpty(token) || !isValidToken)
@@ -202,17 +204,29 @@ namespace AuthService.Controllers
             }
         }
 
+        [HttpGet(nameof(GetUserId))]
+        public ActionResult<string> GetUserId(string token)
+        {
+            string splitToken = token.ToString().Split(' ', 2)[1];
+
+            var handler = new JwtSecurityTokenHandler();
+
+            var jsonToken = handler.ReadJwtToken(splitToken);
+
+            if (jsonToken is null)
+            {
+                return Unauthorized();
+            }
+
+            string id = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? default!;
+            return id;
+        }
+
         [HttpPost(nameof(Logout))]
         public async Task<ActionResult> Logout()
         {
             await _accountService.SignOutAsync();
             return Ok(new { success = true, message = "User logged out successfully!" });
-        }
-
-        [HttpGet(nameof(TestConnection))]
-        public ActionResult<string> TestConnection()
-        {
-            return Ok("Connection established...");
         }
 
         private async Task<string> GenerateJWT(string email)
@@ -224,5 +238,28 @@ namespace AuthService.Controllers
             return _jwtService.GenerateJwtToken(principal.Claims);
         }
 
+
+        //HTTP CONNECTIONS FROM PRODUCT CATALOG SERVICE
+
+        [HttpGet(nameof(TestConnection))]
+        public ActionResult<string> TestConnection()
+        {
+            return Ok(new { success = true, message = "Connection established" });
+        }
+
+        [HttpGet(nameof(isTokenValid))]
+        public ActionResult<bool> isTokenValid(string token)
+        {
+            try
+            {
+                string splitToken = token.ToString().Split(' ', 2)[1];
+
+                return _jwtService.ValidateJwtToken(splitToken);
+            }
+            catch
+            {
+                return Ok(false);
+            }
+        }
     }
 }

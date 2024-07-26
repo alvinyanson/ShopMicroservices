@@ -39,7 +39,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 
 // services
-builder.Services.AddTransient<JWTService>();
+builder.Services.AddTransient<IJWTService, JWTService>();
 builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
 builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services.AddTransient<IHttpContextHelper, HttpContextHelper>();

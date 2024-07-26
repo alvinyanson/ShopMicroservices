@@ -5,6 +5,8 @@ using ProductCatalogService.Data.Repository;
 using ProductCatalogService.SyncDataServices.Http;
 using ProductCatalogService.EventProcessing;
 using ProductCatalogService.AsyncDataServices;
+using ProductCatalogService.Services.Contracts;
+using ProductCatalogService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,15 +24,16 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // database context
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
 });
 
 
 // services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddTransient<ICommandDataClient, CommandDataClient>();
-builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
-builder.Services.AddHostedService<MesageBusSubscriber>();
+builder.Services.AddTransient<IHttpComms, HttpComms>();
+builder.Services.AddTransient<IHttpContextHelper, HttpContextHelper>();
+//builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+//builder.Services.AddHostedService<MesageBusSubscriber>();
 
 var app = builder.Build();
 

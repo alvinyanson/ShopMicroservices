@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Dtos;
 using ProductCatalogService.Models;
+using ProductCatalogService.Services.Contracts;
 using ProductCatalogService.SyncDataServices.Http;
-using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,116 +14,175 @@ namespace ProductCatalogService.Controllers
     [ApiController]
     public class CartsController : ControllerBase
     {
-        private readonly IMapper _mapper;
+        private readonly IHttpContextHelper _httpContextHelper;
+        private readonly IHttpComms _httpComms;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ICommandDataClient _commandDataClient;
+        private readonly IMapper _mapper;
 
         public CartsController(
-            IMapper mapper,
+            IHttpContextHelper httpContextHelper,
+            IHttpComms httpComms,
             IUnitOfWork unitOfWork,
-            IHttpContextAccessor contextAccessor,
-            ICommandDataClient commandDataClient)
+            IMapper mapper)
         {
-            _mapper = mapper;
+            _httpContextHelper = httpContextHelper;
+            _httpComms = httpComms;
             _unitOfWork = unitOfWork;
-            _contextAccessor = contextAccessor;
-            _commandDataClient = commandDataClient;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<string>> GetCartItems()
         {
-            string? ownerId = await GetUserIdFromHeader();
-
-            if (string.IsNullOrEmpty(ownerId))
+            try
             {
-                return Unauthorized();
+                // Check if token is valid
+                string token = _httpContextHelper.GetTokenFromHeaders();
+                bool isValidToken = await ValidateTokenFromAuthService(token);
+
+                if (string.IsNullOrEmpty(token) || !isValidToken)
+                {
+                    return Unauthorized();
+                }
+
+                // Retrieve cart items based on ownerId
+                string ownerId = await GetUserIdFromAuthService(token);
+
+                var cartItems = _unitOfWork.Cart.GetAll().Where(u => u.OwnerId == ownerId);
+
+                return Ok(new { success = true, message = "Cart items retrieved!", result = cartItems });
             }
 
-            var cartItems = _unitOfWork.Cart.GetAll().Where(u => u.OwnerId == ownerId);
-         
-            return Ok(new { success = true, message = "Cart items retrieved!", result = cartItems });
+            catch
+            {
+                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<string>> AddItemToCart(AddToCartDto addToCartDto)
         {
-            string? ownerId = await GetUserIdFromHeader();
-
-            if (string.IsNullOrEmpty(ownerId))
+            try
             {
-                return Unauthorized();
+                // Check if token is valid
+                string token = _httpContextHelper.GetTokenFromHeaders();
+                bool isValidToken = await ValidateTokenFromAuthService(token);
+
+                if (string.IsNullOrEmpty(token) || !isValidToken)
+                {
+                    return Unauthorized();
+                }
+
+                // Retrieve cart items based on ownerId
+                string ownerId = await GetUserIdFromAuthService(token);
+
+                Cart cartFromDb = _unitOfWork.Cart.Get(u => u.OwnerId == ownerId && u.ProductId == addToCartDto.ProductId);
+
+                // Update item qty from cart if it's already existing product
+                if (cartFromDb != null)
+                {
+                    cartFromDb.Quantity += addToCartDto.Quantity;
+
+                    _unitOfWork.Cart.Update(cartFromDb);
+
+                    _unitOfWork.Save();
+
+                    return Ok(new { success = true, message = "Item updated from cart!" });
+                }
+
+                // Add item to cart
+                else
+                {
+                    var result = _mapper.Map<Cart>(addToCartDto);
+
+                    _unitOfWork.Cart.Add(result);
+
+                    _unitOfWork.Save();
+
+                    return Ok(new { success = true, message = "Item added to cart!" });
+                }
+
             }
-
-            Cart cartFromDb = _unitOfWork.Cart.Get(u => u.OwnerId == ownerId && u.ProductId == addToCartDto.ProductId);
-
-            if (cartFromDb != null)
+            catch
             {
-                cartFromDb.Quantity += addToCartDto.Quantity;
-
-                _unitOfWork.Cart.Update(cartFromDb);
-
-                _unitOfWork.Save();
-
-                return Ok(new { success = true, message = "Item updated from cart!" });
+                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
             }
-            else
-            {
-                var result = _mapper.Map<Cart>(addToCartDto);
-
-                _unitOfWork.Cart.Add(result);
-
-                _unitOfWork.Save();
-
-                return Ok(new { success = true, message = "Item added to cart!" });
-            }
-
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<string>> DeleteItemFrom(int id)
         {
-            string? ownerId = await GetUserIdFromHeader();
-
-            if (string.IsNullOrEmpty(ownerId))
+            try
             {
-                return Unauthorized();
+                // Check if token is valid
+                string token = _httpContextHelper.GetTokenFromHeaders();
+                bool isValidToken = await ValidateTokenFromAuthService(token);
+
+                if (string.IsNullOrEmpty(token) || !isValidToken)
+                {
+                    return Unauthorized();
+                }
+
+                // Retrieve cart items based on ownerId
+                string ownerId = await GetUserIdFromAuthService(token);
+
+                var cartFromDb = _unitOfWork.Cart.Get(u => u.OwnerId == ownerId && u.Id == id);
+
+                if (cartFromDb == null)
+                {
+                    return NotFound(new { success = false, message = "Item does not exist from cart!" });
+                }
+
+                // Remove item from cart
+                _unitOfWork.Cart.Remove(cartFromDb);
+
+                _unitOfWork.Save();
+
+                return Ok(new { success = true, message = "Item deleted from cart!" });
             }
-
-            var cartFromDb = _unitOfWork.Cart.Get(u => u.Id == id);
-
-            if (cartFromDb == null)
+            catch
             {
-                return NotFound(new { success = false, message = "Item cannot does not exist from cart!" });
+                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
             }
-
-            _unitOfWork.Cart.Remove(cartFromDb);
-            
-            _unitOfWork.Save();
-            
-            return Ok(new { success = true, message = "Item deleted from cart!" });
         }
 
         [HttpGet(nameof(TestConnection))]
         public async Task<ActionResult<string>> TestConnection()
         {
-            var message = await _commandDataClient.TestConnection();
+            try
+            {
+                var message = await _httpComms.TestConnection();
 
-            return Ok(message);
+                return Ok(message);
+            }
+            catch
+            {
+                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+            }
         }
 
-        private async Task<string> GetUserIdFromHeader()
+        private async Task<string> GetUserIdFromAuthService(string token)
         {
-            var request = _contextAccessor.HttpContext?.Request;
-
-            if (request is null ||
-                !request.Headers.TryGetValue("Authorization", out var authorizationToken))
+            try
             {
-                return default!;
+                return await _httpComms.GetUserId(token);
             }
+            catch
+            {
+                return string.Empty;
+            }
+        }
 
-            return await _commandDataClient.GetId(authorizationToken.ToString());
+        private async Task<bool> ValidateTokenFromAuthService(string token)
+        {
+            try
+            {
+                return await _httpComms.IsTokenValid(token);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

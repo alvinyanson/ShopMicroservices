@@ -1,6 +1,6 @@
-﻿using AuthService.Services.Contracts;
+﻿using ProductCatalogService.Services.Contracts;
 
-namespace AuthService.Services
+namespace ProductCatalogService.Services
 {
     public class HttpContextHelper : IHttpContextHelper
     {

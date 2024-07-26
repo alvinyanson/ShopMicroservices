@@ -21,7 +21,6 @@ namespace ProductCatalogService.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/<ProductController>
         [HttpGet]
         public ActionResult<string> GetProducts()
         {
@@ -30,7 +29,6 @@ namespace ProductCatalogService.Controllers
             return Ok(new { success = true, message = "Products retrieved!", results });
         }
 
-        // GET api/<ProductController>/5
         [HttpGet("{id}")]
         public ActionResult<string> GetProduct(int id)
         {

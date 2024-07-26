@@ -1,4 +1,4 @@
-﻿namespace AuthService.Services.Contracts
+﻿namespace ProductCatalogService.Services.Contracts
 {
     public interface IHttpContextHelper
     {

@@ -104,5 +104,6 @@ namespace AuthService.Services
         {
             await _signInManager.SignOutAsync();
         }
+
     }
 }
