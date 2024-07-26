@@ -31,5 +31,42 @@ namespace AuthService.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public bool ValidateJwtToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("No secret key in application settings."));
+
+            var parameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = _configuration["Jwt:Issuer"],
+                ValidAudience = _configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+
+            try
+            {
+                // Validate the token
+                var principal = tokenHandler.ValidateToken(token, parameters, out SecurityToken validatedToken);
+
+                // Check if the token is a JWT and verify the signing algorithm
+                if (validatedToken is JwtSecurityToken jwtToken &&
+                    jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return true; // Token is valid
+                }
+            }
+            catch
+            {
+                // Token validation failed
+                return false;
+            }
+
+            return false; // Token is invalid; to be explict
+        }
     }
 }

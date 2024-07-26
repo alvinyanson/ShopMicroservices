@@ -1,9 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AuthService.Models
+namespace AuthService.Dtos
 {
-    public class ChangePasswordAccount
+    public class ChangePasswordDto
     {
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
+
         [Required]
         public string Password { get; set; }
 
