@@ -25,8 +25,8 @@ builder.Services.AddAuthentication(options =>
 })
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login";
-        options.LogoutPath = "/Auth/Logout";
+        options.LoginPath = $"/Identity/Auth/Login";
+        options.LogoutPath = $"/Identity/Auth/Logout";
     })
     .AddJwtBearer(options =>
     {
@@ -43,6 +43,7 @@ builder.Services.AddAuthentication(options =>
     });
 
 builder.Services.AddAuthorization();
+
 builder.Services.AddMvc(options =>
 {
     var policy = new AuthorizationPolicyBuilder()
@@ -51,6 +52,12 @@ builder.Services.AddMvc(options =>
 
     options.Filters.Add(new AuthorizeFilter(policy));
 }).AddXmlSerializerFormatters();
+
+//builder.Services.ConfigureApplicationCookie(options => {
+//    options.LoginPath = $"/Identity/Account/Login";
+//    options.LogoutPath = $"/Identity/Account/Logout";
+//    options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+//});
 
 var app = builder.Build();
 
@@ -80,7 +87,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -90,6 +97,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
