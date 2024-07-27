@@ -10,6 +10,9 @@ namespace ShopWebApp.Profiles
         {
             CreateMap<Register, Login>();
             CreateMap<Register, RegisterDto>();
+
+
+            CreateMap<Cart, AddItemToCartDto>();
         }
     }
 }

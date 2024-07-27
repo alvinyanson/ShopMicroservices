@@ -76,6 +76,8 @@ namespace ProductCatalogService.Controllers
                 // Retrieve cart items based on ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
 
+                Console.WriteLine($"OWNER ID 🤓: {ownerId}");
+
                 Cart cartFromDb = _unitOfWork.Cart.Get(u => u.OwnerId == ownerId && u.ProductId == addToCartDto.ProductId);
 
                 // Update item qty from cart if it's already existing product
@@ -93,6 +95,8 @@ namespace ProductCatalogService.Controllers
                 // Add item to cart
                 else
                 {
+                    addToCartDto.OwnerId = ownerId;
+
                     var result = _mapper.Map<Cart>(addToCartDto);
 
                     _unitOfWork.Cart.Add(result);
