@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@inject IAuthorizationService authService
+
+@{
+    string currentArea = ViewContext.RouteData.Values["area"]?.ToString();
+    string currentController = ViewContext.RouteData.Values["controller"].ToString();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -25,6 +32,16 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark">Privacy</a>
                         </li>
+
+                        @* @if ((await authService.AuthorizeAsync(User, "AdminRights")).Succeeded)
+                        { *@
+                            <li class="nav-item">
+                                <a class="nav-link @(currentArea == "Admin" && currentController == "Products" ? "active" : "")" asp-area="Admin" asp-controller="Products" asp-action="Index">Manage Products</a>
+                            </li>
+@*                             <li class="nav-item">
+                                <a class="nav-link @(currentArea == "Admin" && currentController == "Category" ? "active" : "")" asp-area="Admin" asp-controller="Category" asp-action="Index">Manage Categories</a>
+                            </li> *@
+                        @* } *@
                     </ul>
                 </div>
             </div>
