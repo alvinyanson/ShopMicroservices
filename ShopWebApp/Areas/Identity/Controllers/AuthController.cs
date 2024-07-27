@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using ShopWebApp.Services.Contracts;
 using ShopWebApp.Services.HttpClients;
 using ShopWebApp.Services;
-using ShopWebApp.Models.ViewModels;
 using ShopWebApp.Models;
 using System.Text.Json;
+using ShopWebApp.Dtos;
 
 namespace ShopWebApp.Areas.Identity.Controllers
 {
@@ -39,10 +39,16 @@ namespace ShopWebApp.Areas.Identity.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginVM loginVM)
+        [HttpGet]
+        public IActionResult Register()
         {
-            HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, loginVM.Credential, "Login");
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(Login request)
+        {
+            HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, request, "Login");
 
             if (response is null)
             {
@@ -58,7 +64,7 @@ namespace ShopWebApp.Areas.Identity.Controllers
 
                 await _authService.SignInAsync(HttpContext, apiResponse.Result);
 
-                return RedirectToAction("Index", "Home", new { area = "Customer"});
+                return RedirectToAction("Index", "Home", new { area = "Customer" });
             }
             else
             {
@@ -67,8 +73,34 @@ namespace ShopWebApp.Areas.Identity.Controllers
                 var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
 
                 ModelState.AddModelError("", apiResponse.Message);
+                return View(nameof(Login));
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(Register request)
+        {
+            var credentialsDto = _mapper.Map<RegisterDto>(request);
+            HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, credentialsDto, "Register");
+
+            if (response == null)
+            {
+                ModelState.AddModelError("", "Unable to connect to authentication service. Please contact admin.");
                 return View();
             }
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+
+            if(!apiResponse.Success)
+            {
+                ModelState.AddModelError("", apiResponse.Message);
+
+                return View(nameof(Register));
+            }
+
+            return await Login(_mapper.Map<Login>(request));
         }
     }
 }

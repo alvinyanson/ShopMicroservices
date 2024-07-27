@@ -85,8 +85,8 @@ namespace AuthService.Controllers
                 string jwt = await GenerateJWT(account.Email);
 
                 // Async event AuthService -> ProductCatalogService (listen for new user, send a welcome email or special offers on ProductCatalogService)
-                var userSignUpDto = _mapper.Map<UserSignUpDto>(account);
-                _messageBusClient.UserSignUp(userSignUpDto);
+                //var userSignUpDto = _mapper.Map<UserSignUpDto>(account);
+                //_messageBusClient.UserSignUp(userSignUpDto);
 
                 // Success register
                 return Ok(new { success = true, message = "User registered successfully!", result = jwt });

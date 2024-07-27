@@ -20,8 +20,6 @@
     <Folder Include="Areas\Admin\Views\" />
     <Folder Include="Areas\Customer\Data\" />
     <Folder Include="Areas\Customer\Models\" />
-    <Folder Include="Areas\Identity\Data\" />
-    <Folder Include="Areas\Identity\Models\" />
   </ItemGroup>
 
 </Project>
