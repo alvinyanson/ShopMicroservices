@@ -24,9 +24,9 @@ namespace ProductCatalogService.Controllers
         [HttpGet]
         public ActionResult<string> GetProducts()
         {
-            var results = _unitOfWork.Product.GetAll();
+            var result = _unitOfWork.Product.GetAll();
 
-            return Ok(new { success = true, message = "Products retrieved!", results });
+            return Ok(new { success = true, message = "Products retrieved!", result });
         }
 
         [HttpGet("{id}")]
