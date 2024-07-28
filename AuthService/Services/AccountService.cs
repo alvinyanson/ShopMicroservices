@@ -100,10 +100,5 @@ namespace AuthService.Services
             return await _userManager.SetUserNameAsync(user, email);
         }
 
-        public async Task SignOutAsync()
-        {
-            await _signInManager.SignOutAsync();
-        }
-
     }
 }

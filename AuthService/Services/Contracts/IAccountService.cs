@@ -10,8 +10,6 @@ namespace AuthService.Services.Contracts
 
         Task<SignInResult> LoginAsync(LoginAccount loginAccount);
 
-        Task SignOutAsync();
-
         Task<bool> IsSignedIn(ClaimsPrincipal claimsPrincipal);
 
         Task<IdentityUser> FindByEmailAsync(string email);

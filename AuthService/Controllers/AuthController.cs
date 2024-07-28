@@ -222,13 +222,6 @@ namespace AuthService.Controllers
             return id;
         }
 
-        [HttpGet(nameof(Logout))]
-        public async Task<ActionResult> Logout()
-        {
-            await _accountService.SignOutAsync();
-            return Ok(new { success = true, message = "User logged out successfully!" });
-        }
-
         private async Task<string> GenerateJWT(string email)
         {
             var identityUser = await _accountService.FindByEmailAsync(email);
