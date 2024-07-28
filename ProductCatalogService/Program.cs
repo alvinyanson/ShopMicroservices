@@ -24,7 +24,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // database context
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 
@@ -32,8 +32,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IHttpComms, HttpComms>();
 builder.Services.AddTransient<IHttpContextHelper, HttpContextHelper>();
-//builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
-//builder.Services.AddHostedService<MesageBusSubscriber>();
+builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+builder.Services.AddHostedService<MesageBusSubscriber>();
 
 var app = builder.Build();
 

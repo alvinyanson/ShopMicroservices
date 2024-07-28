@@ -64,7 +64,7 @@ namespace ShopWebApp.Areas.Identity.Controllers
 
             if (response is null)
             {
-                ModelState.AddModelError("", "Unable to connect to authentication service. Please contact admin.");
+                ModelState.AddModelError("", "Unable to connect to authentication service.");
                 return View();
             }
 

@@ -72,9 +72,9 @@ namespace ShopWebApp.Services
                     return await client.PostAsync(absoluteUri, httpContent);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Console.WriteLine($"Unable to connect to {_client.NormalizedName}");
+                Console.WriteLine($"Unable to connect to {_client.NormalizedName} {ex.Message}");
             }
 
             return default!;
