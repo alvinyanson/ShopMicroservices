@@ -1,0 +1,84 @@
+﻿@model ProductVM
+
+<div class="card shadow border-0 my-4">
+    <div class="card-header bg-primary bg-gradient text-light ml-0 py-4">
+        <div class="row px-4">
+            <div class="col-6">
+                <h5 class="pt-2 text-white">
+                    @(Model.Product.Id != 0 ? "Update" : "Create") Product
+                </h5>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="POST" class="row" enctype="multipart/form-data">
+            <input asp-for="Product.Id" hidden />
+
+            <div class="row">
+                @* Product form *@
+                <div class="col-10">
+                    <div class="p-3">
+                        @* Name *@
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Product.Name" class="form-control border-0 shadow" />
+                            <label asp-for="Product.Name" class="ms-2"></label>
+                            <span asp-validation-for="Product.Name" class="text-danger"></span>
+                        </div>
+
+                        @* Description *@
+                        <div class="form-floating py-2 col-12">
+                            <textarea asp-for="Product.Description" class="form-control border-0 shadow"></textarea>
+                            <label asp-for="Product.Description" class="ms-2"></label>
+                        </div>
+
+                        @* Price *@
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Product.Price" class="form-control border-0 shadow" />
+                            <label asp-for="Product.Price" class="ms-2"></label>
+                            <span asp-validation-for="Product.Price" class="text-danger"></span>
+                        </div>
+
+
+                        <div class="form-floating py-2 col-12">
+                            <select asp-for="@Model.Product.CategoryId" asp-items="@Model.Categories" class="form-select border-0 shadow">
+                                <option disabled selected>--Select Category--</option>
+                            </select>
+                            <label asp-for="Product.CategoryId" class="ms-2"></label>
+                            <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
+                        </div>
+
+                        @* Image *@
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Product.ImageUrl" class="form-control border-0 shadow" />
+                            <label asp-for="Product.ImageUrl" class="ms-2"></label>
+                            <span asp-validation-for="Product.ImageUrl" class="text-danger"></span>
+                        </div>
+
+                        @* CTA *@
+                        <div class="pt-2">
+                            <button type="submit" class="btn btn-primary me-3">Save</button>
+                            <a asp-action="Index" class="btn btn-secondary">Back</a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Product image *@
+                @if (!string.IsNullOrEmpty(Model.Product.ImageUrl))
+                {
+                    <div class="col-2">
+                        <img src="@Model.Product.ImageUrl" width="100%" class="rounded-4" />
+                    </div>
+                }
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

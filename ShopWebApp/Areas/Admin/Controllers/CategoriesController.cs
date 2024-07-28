@@ -39,7 +39,7 @@ namespace ShopWebApp.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(int? id)
         {
-            if(id== null || id == 0)
+            if (id == null || id == 0)
             {
                 return View(new Category());
             }
@@ -75,7 +75,7 @@ namespace ShopWebApp.Areas.Admin.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             HttpResponseMessage? response = await _productCatalogService.DeleteAsync(HttpContext, $"Categories/{id}");
-            
+
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
             var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);

@@ -38,27 +38,22 @@ namespace ProductCatalogService.Controllers
         }
 
         [HttpPost]
-        public ActionResult<string> AddProduct(ProductCreateDto productCreateDto)
-        {
-            var product = _mapper.Map<Product>(productCreateDto);
-
-            _unitOfWork.Product.Add(product);
-
-            _unitOfWork.Save();
-
-            return Ok(new { success = true, message = "Product created!" });
-        }
-
-        [HttpPut]
         public ActionResult<string> UpdateProduct(ProductUpdateDto productUpdateDto)
         {
             var product = _mapper.Map<Product>(productUpdateDto);
 
-            _unitOfWork.Product.Update(product);
+            if(product.Id == 0)
+            {
+                _unitOfWork.Product.Add(product);
+            }
+            else
+            {
+                _unitOfWork.Product.Update(product);
+            }
 
             _unitOfWork.Save();
 
-            return Ok(new { success = true, message = "Product updated!" });
+            return Ok(new { success = true, message = "Product saved!" });
         }
 
         [HttpDelete("{id}")]
