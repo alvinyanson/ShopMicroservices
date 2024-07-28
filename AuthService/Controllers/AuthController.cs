@@ -103,6 +103,19 @@ namespace AuthService.Controllers
         {
             try
             {
+                // Check if token is valid
+                string token = _httpContextHelper.GetTokenFromHeaders();
+
+                string splitToken = token.ToString().Split(' ', 2)[1];
+
+                bool isValidToken = _jwtService.ValidateJwtToken(splitToken);
+
+                if (string.IsNullOrEmpty(token) || !isValidToken)
+                {
+                    return Unauthorized();
+                }
+
+
                 // Find existing user
                 var existingUser = await _accountService.FindByEmailAsync(request.Email);
                 if (existingUser == null)
@@ -135,7 +148,10 @@ namespace AuthService.Controllers
             {
                 // Check if token is valid
                 string token = _httpContextHelper.GetTokenFromHeaders();
-                bool isValidToken = _jwtService.ValidateJwtToken(token);
+
+                string splitToken = token.ToString().Split(' ', 2)[1];
+
+                bool isValidToken = _jwtService.ValidateJwtToken(splitToken);
 
                 if (string.IsNullOrEmpty(token) || !isValidToken)
                 {

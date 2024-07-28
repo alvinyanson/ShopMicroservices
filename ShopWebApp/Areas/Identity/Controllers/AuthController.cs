@@ -45,6 +45,18 @@ namespace ShopWebApp.Areas.Identity.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult ChangeUsernameAndEmail()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Login(Login request)
         {
@@ -101,6 +113,36 @@ namespace ShopWebApp.Areas.Identity.Controllers
             }
 
             return await Login(_mapper.Map<Login>(request));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeUsernameAndEmail(ChangeUsernameAndEmailDto request)
+        {
+            HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, request, "ChangeEmailAndUsername");
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+
+            return RedirectToAction("Index", "Home", new { area = "Customer" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto request)
+        {
+            HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, request, "ChangePassword");
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+
+            if(!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError("", apiResponse.Message);
+                return View(nameof(ChangePassword));
+            }
+
+            return RedirectToAction("Index", "Home", new { area = "Customer" });
         }
 
         public async Task<IActionResult> Logout()
