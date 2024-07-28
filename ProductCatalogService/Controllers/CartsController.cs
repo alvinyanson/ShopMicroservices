@@ -48,9 +48,34 @@ namespace ProductCatalogService.Controllers
                 // Retrieve cart items based on ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
 
-                var cartItems = _unitOfWork.Cart.GetAll().Where(u => u.OwnerId == ownerId);
+                var cartItems = _unitOfWork.Cart.GetAll("Product").Where(u => u.OwnerId == ownerId);
 
                 return Ok(new { success = true, message = "Cart items retrieved!", result = cartItems });
+            }
+
+            catch
+            {
+                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<string>> GetCartItem(int id)
+        {
+            try
+            {
+                // Check if token is valid
+                string token = _httpContextHelper.GetTokenFromHeaders();
+                bool isValidToken = await ValidateTokenFromAuthService(token);
+
+                if (string.IsNullOrEmpty(token) || !isValidToken)
+                {
+                    return Unauthorized();
+                }
+
+                var cartItem = _unitOfWork.Cart.Get(u => u.Id == id);
+
+                return Ok(new { success = true, message = "Cart item retrieved!", result = cartItem });
             }
 
             catch
@@ -83,7 +108,9 @@ namespace ProductCatalogService.Controllers
                 // Update item qty from cart if it's already existing product
                 if (cartFromDb != null)
                 {
-                    cartFromDb.Quantity += addToCartDto.Quantity;
+                    cartFromDb.Quantity = addToCartDto.Quantity;
+
+                    Console.WriteLine($"quantity: {cartFromDb.Quantity}");
 
                     _unitOfWork.Cart.Update(cartFromDb);
 
