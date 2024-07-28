@@ -7,6 +7,7 @@ using ShopWebApp.Services;
 using ShopWebApp.Models;
 using System.Text.Json;
 using ShopWebApp.Dtos;
+using ShopWebApp.Models.ViewModels;
 
 namespace ShopWebApp.Areas.Identity.Controllers
 {
@@ -42,7 +43,7 @@ namespace ShopWebApp.Areas.Identity.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            return View();
+            return View(new RegisterVM());
         }
 
         [HttpGet]
@@ -90,9 +91,9 @@ namespace ShopWebApp.Areas.Identity.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(Register request)
+        public async Task<IActionResult> Register(RegisterVM request)
         {
-            var credentialsDto = _mapper.Map<RegisterDto>(request);
+            var credentialsDto = _mapper.Map<RegisterDto>(request.Register);
             HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, credentialsDto, "Register");
 
             if (response == null)
@@ -112,7 +113,7 @@ namespace ShopWebApp.Areas.Identity.Controllers
                 return View(nameof(Register));
             }
 
-            return await Login(_mapper.Map<Login>(request));
+            return await Login(_mapper.Map<Login>(request.Register));
         }
 
         [HttpPost]
