@@ -44,23 +44,18 @@ namespace ProductCatalogService.Controllers
         {
             var category = _mapper.Map<Category>(categoryCreateDto);
 
-            _unitOfWork.Category.Add(category);
+            if (category.Id == 0)
+            {
+                _unitOfWork.Category.Add(category);
+            }
+            else
+            {
+                _unitOfWork.Category.Update(category);
+            }
 
             _unitOfWork.Save();
 
-            return Ok(new { success = true, message = "Category created!" });
-        }
-
-        [HttpPut]
-        public ActionResult<string> UpdateCategory(CategoryUpdateDto categoryUpdateDto)
-        {
-            var category = _mapper.Map<Category>(categoryUpdateDto);
-
-            _unitOfWork.Category.Update(category);
-
-            _unitOfWork.Save();
-
-            return Ok(new { success = true, message = "Category updated!" });
+            return Ok(new { success = true, message = "Category saved!" });
         }
 
         [HttpDelete("{id}")]
