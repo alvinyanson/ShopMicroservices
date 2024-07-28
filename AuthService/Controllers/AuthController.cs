@@ -222,7 +222,7 @@ namespace AuthService.Controllers
             return id;
         }
 
-        [HttpPost(nameof(Logout))]
+        [HttpGet(nameof(Logout))]
         public async Task<ActionResult> Logout()
         {
             await _accountService.SignOutAsync();

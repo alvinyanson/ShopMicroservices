@@ -1,8 +1,9 @@
-﻿@inject IAuthorizationService authService
+﻿@using WebClient.Enums
 
 @{
     string currentArea = ViewContext.RouteData.Values["area"]?.ToString();
     string currentController = ViewContext.RouteData.Values["controller"].ToString();
+    string currentAction = ViewContext.RouteData.Values["action"].ToString();
 }
 
 <!DOCTYPE html>
@@ -26,23 +27,41 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                    
+
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark">Privacy</a>
+                            <a class="nav-link @(currentArea == "Customer" && currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
-                        @* @if ((await authService.AuthorizeAsync(User, "AdminRights")).Succeeded)
-                        { *@
+
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            @if (User.IsInRole(nameof(Role.Admin)))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentArea == "Admin" && currentController == "Products" ? "active" : "")" asp-area="Admin" asp-controller="Products" asp-action="Index">Manage Products</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentArea == "Admin" && currentController == "Categories" ? "active" : "")" asp-area="Admin" asp-controller="Categories" asp-action="Index">Manage Categories</a>
+                                </li>
+                            }
                             <li class="nav-item">
-                                <a class="nav-link @(currentArea == "Admin" && currentController == "Products" ? "active" : "")" asp-area="Admin" asp-controller="Products" asp-action="Index">Manage Products</a>
+                                <a class="nav-link text-dark" asp-area="Identity" asp-controller="Auth" asp-action="Logout">
+                                    <i class="bi bi-box-arrow-right"></i> Logout @User.Identity.Name
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" && currentAction == "Register" ? "active" : "")" id="register" asp-area="Identity" asp-controller="Auth" asp-action="Register">Register</a>
                             </li>
                             <li class="nav-item">
-                            <a class="nav-link @(currentArea == "Admin" && currentController == "Categories" ? "active" : "")" asp-area="Admin" asp-controller="Categories" asp-action="Index">Manage Categories</a>
+                                <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" && currentAction == "LogIn" ? "active" : "")" id="login" asp-area="Identity" asp-controller="Auth" asp-action="LogIn">Login</a>
                             </li>
-                        @* } *@
+                        }
                     </ul>
                 </div>
             </div>

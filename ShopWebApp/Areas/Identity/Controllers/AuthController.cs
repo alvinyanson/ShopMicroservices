@@ -102,5 +102,11 @@ namespace ShopWebApp.Areas.Identity.Controllers
 
             return await Login(_mapper.Map<Login>(request));
         }
+
+        public async Task<IActionResult> Logout()
+        {
+            await _authService.SignOutAsync(HttpContext);
+            return RedirectToAction(nameof(Login));
+        }
     }
 }

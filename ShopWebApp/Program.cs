@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using ShopWebApp.Services;
@@ -53,11 +54,6 @@ builder.Services.AddMvc(options =>
     options.Filters.Add(new AuthorizeFilter(policy));
 }).AddXmlSerializerFormatters();
 
-//builder.Services.ConfigureApplicationCookie(options => {
-//    options.LoginPath = $"/Identity/Account/Login";
-//    options.LogoutPath = $"/Identity/Account/Logout";
-//    options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-//});
 
 var app = builder.Build();
 
