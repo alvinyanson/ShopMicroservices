@@ -15,7 +15,6 @@ namespace AuthService.Dtos
         public string NewPassword { get; set; }
 
         [Required]
-        [Compare(nameof(NewPassword))]
         public string ConfirmPassword { get; set; }
     }
 }

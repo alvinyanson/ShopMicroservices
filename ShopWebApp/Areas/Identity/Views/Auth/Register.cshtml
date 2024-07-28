@@ -32,10 +32,6 @@
 
         @* Role *@
         <div class="form-group mb-4">
-@*             <label asp-for="Register.Role">Role (kindly input 'Admin' or 'Customer')</label>
-            <input asp-for="Register.Role" class="form-control" />
-            <span asp-validation-for="Register.Role" class="text-danger"></span> *@
-
             <label asp-for="@Model.Register.Role" class="ms-2"></label>
             <select asp-for="@Model.Register.Role" asp-items="@Model.Roles" class="form-select">
                 <option disabled selected>--Select Category--</option>
@@ -43,6 +39,7 @@
             <span asp-validation-for="@Model.Register.Role" class="text-danger"></span>
         </div>
 
+        @* CTA *@
         <div class="d-flex">
             <a asp-action="login" class="btn btn-link w-100">Have an account? Sign in</a>
             <button type="submit" class="btn btn-primary w-100 ms-2">Create account</button>

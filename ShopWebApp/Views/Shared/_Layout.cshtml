@@ -33,24 +33,25 @@
 
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link @(currentArea == "Customer" && currentController == "Home" ? "active" : "")" asp-area="Customer" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link @(currentArea == "Customer" && currentController == "Home" && currentAction == "Index" ? "active" : "")" asp-area="Customer" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link @(currentArea == "Customer" && currentController == "Cart" ? "active" : "")" asp-area="Customer" asp-controller="Cart" asp-action="Index">Cart</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" ? "active" : "")" asp-area="Identity" asp-controller="Auth" asp-action="ChangeUsernameAndEmail">Change Username and Email</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" ? "active" : "")" asp-area="Identity" asp-controller="Auth" asp-action="ChangePassword">Change Password</a>
+                            <a class="nav-link @(currentArea == "Customer" && currentController == "Cart" && currentAction == "Index" ? "active" : "")" asp-area="Customer" asp-controller="Cart" asp-action="Index">Cart</a>
                         </li>
 
 
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" && currentAction == "ChangeUsernameAndEmail" ? "active" : "")" asp-area="Identity" asp-controller="Auth" asp-action="ChangeUsernameAndEmail">Change  Email</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" && currentAction == "ChangePassword" ? "active" : "")" asp-area="Identity" asp-controller="Auth" asp-action="ChangePassword">Change Password</a>
+                            </li>
+
+
                             @if (User.IsInRole(nameof(Role.Admin)))
                             {
                                 <li class="nav-item">

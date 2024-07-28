@@ -15,18 +15,18 @@ namespace ShopWebApp.Areas.Identity.Controllers
     public class AuthController : Controller
     {
 
-        private readonly IMapper _mapper;
         private readonly IHttpServiceWrapper _httpService;
         private readonly AuthService _authService;
+        private readonly IMapper _mapper;
 
         public AuthController(
-            IMapper mapper,
+            AuthService authService,
             IConfiguration config,
-            AuthService authService)
+            IMapper mapper)
         {
-            _mapper = mapper;
-            _authService = authService;
             _httpService = new HttpService<HttpAuthService>(config, authService);
+            _authService = authService;
+            _mapper = mapper;
         }
 
         public IActionResult Index()
@@ -63,31 +63,29 @@ namespace ShopWebApp.Areas.Identity.Controllers
         {
             HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, request, "Login");
 
-            if (response is null)
+            if (response == null)
             {
-                ModelState.AddModelError("", "Unable to connect to authentication service.");
+                ModelState.AddModelError("", "Unable to connect to auth service.");
                 return View();
             }
 
-            if (response.IsSuccessStatusCode)
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+
+            if (!response.IsSuccessStatusCode)
             {
-                var jsonResponse = await response.Content.ReadAsStringAsync();
+                if (parsedResponse != null)
+                {
+                    AddErrorMessage(parsedResponse.Message);
+                }
 
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
-
-                await _authService.SignInAsync(HttpContext, apiResponse.Result);
-
-                return RedirectToAction("Index", "Home", new { area = "Customer" });
-            }
-            else
-            {
-                var jsonResponse = await response.Content.ReadAsStringAsync();
-
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
-
-                ModelState.AddModelError("", apiResponse.Message);
                 return View(nameof(Login));
             }
+
+            await _authService.SignInAsync(HttpContext, parsedResponse.Result);
+
+            return RedirectToAction("Index", "Home", new { area = "Customer" });
         }
 
         [HttpPost]
@@ -98,22 +96,26 @@ namespace ShopWebApp.Areas.Identity.Controllers
 
             if (response == null)
             {
-                ModelState.AddModelError("", "Unable to connect to authentication service. Please contact admin.");
+                ModelState.AddModelError("", "Unable to connect to authentication service.");
                 return View();
             }
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+            var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
 
-            if(!apiResponse.Success)
+            if (!response.IsSuccessStatusCode)
             {
-                ModelState.AddModelError("", apiResponse.Message);
+                if (parsedResponse != null)
+                {
+                    AddErrorMessage(parsedResponse.Message);
+                }
 
                 return View(nameof(Register));
             }
 
             return await Login(_mapper.Map<Login>(request.Register));
+
         }
 
         [HttpPost]
@@ -121,9 +123,25 @@ namespace ShopWebApp.Areas.Identity.Controllers
         {
             HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, request, "ChangeEmailAndUsername");
 
+            if (response == null)
+            {
+                ModelState.AddModelError("", "Unable to connect to auth service.");
+                return View();
+            }
+
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+            var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (parsedResponse != null)
+                {
+                    AddErrorMessage(parsedResponse.Message);
+                }
+
+                return View(nameof(ChangeUsernameAndEmail));
+            }
 
             return RedirectToAction("Index", "Home", new { area = "Customer" });
         }
@@ -133,13 +151,23 @@ namespace ShopWebApp.Areas.Identity.Controllers
         {
             HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, request, "ChangePassword");
 
+            if (response == null)
+            {
+                ModelState.AddModelError("", "Unable to connect to auth service.");
+                return View();
+            }
+
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+            var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
 
-            if(!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                ModelState.AddModelError("", apiResponse.Message);
+                if (parsedResponse != null)
+                {
+                    AddErrorMessage(parsedResponse.Message);
+                }
+
                 return View(nameof(ChangePassword));
             }
 
@@ -149,7 +177,13 @@ namespace ShopWebApp.Areas.Identity.Controllers
         public async Task<IActionResult> Logout()
         {
             await _authService.SignOutAsync(HttpContext);
+            
             return RedirectToAction(nameof(Login));
+        }
+
+        private void AddErrorMessage(string errorMessage)
+        {
+            ModelState.AddModelError("", errorMessage);
         }
     }
 }
