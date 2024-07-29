@@ -181,6 +181,15 @@ Open on any browser http://localhost:15672, then login using the credentials men
 ![RabbitMQUI Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/RabbitMQUI.png)
 
 
+Here's a sample log when a user registers. A message is sent from `AuthService` to `ProductCatalogService`.
+
+**AuthService**
+![RabbitMQ AuthService](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/Screenshot%202024-07-29%20173025.png)
+
+**ProductCatalogService**
+![RabbitMQ AuthService](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/Screenshot%202024-07-29%20173200.png)
+
+
 ### API Gateway Deployment (Ingress Nginx)
 
 Ingress will act as a reverse proxy and load balancer, handling external traffic and routing it to our specified services.
