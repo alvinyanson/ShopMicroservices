@@ -19,7 +19,7 @@ namespace ProductCatalogService.Models
         [ValidateNever]
         public virtual Product Product { get; set; }
 
-        [DefaultValue(0)]
+        [DefaultValue(1)]
         [Range(1, 100, ErrorMessage = "Please enter a value between 1 and 100")]
         public int Quantity { get; set; }
     }

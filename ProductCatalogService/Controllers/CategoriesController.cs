@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CatalogService.Services;
 using Microsoft.AspNetCore.Mvc;
 using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Dtos;
@@ -8,6 +9,7 @@ using ProductCatalogService.Models;
 
 namespace ProductCatalogService.Controllers
 {
+    [AuthHeaderFilter]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase
@@ -36,13 +38,18 @@ namespace ProductCatalogService.Controllers
         {
             var result = _unitOfWork.Category.Get(u => u.Id == id);
 
+            if (result == null)
+            {
+                return NotFound(new { success = false, message = $"Category with id {id} does not exist!" });
+            }
+
             return Ok(new { success = true, message = "Category retrieved!", result });
         }
 
         [HttpPost]
-        public ActionResult<string> AddCategory(CategoryCreateDto categoryCreateDto)
+        public ActionResult<string> CreateOrUpdateCategory(CreateCategoryDto request)
         {
-            var category = _mapper.Map<Category>(categoryCreateDto);
+            var category = _mapper.Map<Category>(request);
 
             if (category.Id == 0)
             {
@@ -61,6 +68,14 @@ namespace ProductCatalogService.Controllers
         [HttpDelete("{id}")]
         public ActionResult<string> Delete(int id)
         {
+
+            var result = _unitOfWork.Category.Get(u => u.Id == id);
+
+            if (result == null)
+            {
+                return NotFound(new { success = false, message = $"Category with id {id} does not exist!" });
+            }
+
             _unitOfWork.Category.Remove(id);
 
             _unitOfWork.Save();

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CatalogService.Services;
 using Microsoft.AspNetCore.Mvc;
 using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Dtos;
@@ -34,13 +35,19 @@ namespace ProductCatalogService.Controllers
         {
             var result = _unitOfWork.Product.Get(u => u.Id == id);
 
+            if(result == null)
+            {
+                return NotFound(new { success = false, message = $"Product with id {id} does not exist!" });
+            }
+
             return Ok(new { success = true, message = "Product retrieved!", result });
         }
 
+        [AuthHeaderFilter]
         [HttpPost]
-        public ActionResult<string> UpdateProduct(ProductUpdateDto productUpdateDto)
+        public ActionResult<string> CreateOrUpdateProduct(UpdateProductDto request)
         {
-            var product = _mapper.Map<Product>(productUpdateDto);
+            var product = _mapper.Map<Product>(request);
 
             if(product.Id == 0)
             {
@@ -56,9 +63,18 @@ namespace ProductCatalogService.Controllers
             return Ok(new { success = true, message = "Product saved!" });
         }
 
+        [AuthHeaderFilter]
         [HttpDelete("{id}")]
         public ActionResult<string> Delete(int id)
         {
+
+            var result = _unitOfWork.Product.Get(u => u.Id == id);
+
+            if(result == null)
+            {
+                return NotFound(new { success = false, message = $"Product with id {id} does not exist!" });
+            }
+
             _unitOfWork.Product.Remove(id);
 
             _unitOfWork.Save();

@@ -20,10 +20,8 @@ namespace ProductCatalogService.SyncDataServices.Http
                 {
                     return await response.Content.ReadAsStringAsync();
                 }
-                else
-                {
-                    return string.Empty;
-                }
+
+                return string.Empty;
             }
         }
 
@@ -43,12 +41,9 @@ namespace ProductCatalogService.SyncDataServices.Http
                     }
                     
                     return false;
+                }
 
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -59,15 +54,15 @@ namespace ProductCatalogService.SyncDataServices.Http
                 var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/TestConnection");
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Sync GET to TestConnection was OK");
+                    Console.WriteLine("Http test connection works on AuthService");
+                    
                     string message = await response.Content.ReadAsStringAsync();
                     return message;
                 }
-                else
-                {
-                    Console.WriteLine("Sync GET to TestConnection was FAILED");
-                    return string.Empty;
-                }
+
+                Console.WriteLine("Http test connection failed on AuthService");
+                
+                return string.Empty;
             }
         }
     }

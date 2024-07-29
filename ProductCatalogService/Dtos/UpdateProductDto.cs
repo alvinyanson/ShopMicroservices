@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProductCatalogService.Dtos
 {
-    public class ProductUpdateDto : ProductCreateDto
+    public class UpdateProductDto : CreateProductDto
     {
         public int Id { get; set; }
     }

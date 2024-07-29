@@ -51,7 +51,7 @@ namespace ProductCatalogService.AsyncDataServices
 
             consumer.Received += (ModuleHandle, ea) =>
             {
-                Console.WriteLine("Event received.");
+                Console.WriteLine("User sign up received...");
 
                 var body = ea.Body;
                 var message = Encoding.UTF8.GetString(body.ToArray());

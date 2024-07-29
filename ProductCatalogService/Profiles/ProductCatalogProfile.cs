@@ -8,15 +8,15 @@ namespace ProductCatalogService.Profiles
     {
         public ProductCatalogProfile()
         {
-            CreateMap<ProductCreateDto, Product>();
-            CreateMap<ProductUpdateDto, Product>();
+            CreateMap<CreateProductDto, Product>();
+            CreateMap<UpdateProductDto, Product>();
 
 
-            CreateMap<CategoryCreateDto, Category>();
-            CreateMap<CategoryUpdateDto, Category>();
+            CreateMap<CreateCategoryDto, Category>();
+            CreateMap<UpdateCategoryDto, Category>();
 
 
-            CreateMap<AddToCartDto, Cart>();
+            CreateMap<AddItemToCartDto, Cart>();
         }
     }
 }

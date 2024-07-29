@@ -22,7 +22,7 @@ namespace ProductCatalogService.EventProcessing
             switch (eventType)
             {
                 case EventType.Customer:
-                    Console.WriteLine("User is created, now do something else here... maybe send welcome email");
+                    Console.WriteLine($"User sign up! Now do something else here, maybe send welcome email.");
                     break;
 
                 default:
@@ -32,20 +32,20 @@ namespace ProductCatalogService.EventProcessing
 
         private EventType DetermineEvent(string notificationMessage)
         {
-            Console.WriteLine("Determining Event...");
+            Console.WriteLine("Determining event...");
 
             var eventType = JsonSerializer.Deserialize<GenericEventDto>(notificationMessage);
 
             switch (eventType.Role)
             {
                 case "Customer":
-                    Console.WriteLine("User created with role of customer event detected...");
+                    Console.WriteLine("User created with Customer role...");
                     return EventType.Customer;
                 case "Admin":
-                    Console.WriteLine("User created with role of admin event detected...");
+                    Console.WriteLine("User created with Admin role...");
                     return EventType.Admin;
                 default:
-                    Console.WriteLine("Could not determine user type...");
+                    Console.WriteLine("Could not determine User type...");
                     return EventType.Undetermined;
 
             }

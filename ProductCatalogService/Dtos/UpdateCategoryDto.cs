@@ -1,8 +1,7 @@
 ﻿namespace ProductCatalogService.Dtos
 {
-    public class CategoryCreateDto
+    public class UpdateCategoryDto : CreateCategoryDto
     {
         public int Id { get; set; }
-        public string Name { get; set; }
     }
 }

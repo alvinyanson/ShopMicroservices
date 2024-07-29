@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CatalogService.Services;
 using Microsoft.AspNetCore.Mvc;
 using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Dtos;
@@ -31,6 +32,7 @@ namespace ProductCatalogService.Controllers
             _mapper = mapper;
         }
 
+        [AuthHeaderFilter]
         [HttpGet]
         public async Task<ActionResult<string>> GetCartItems()
         {
@@ -55,10 +57,11 @@ namespace ProductCatalogService.Controllers
 
             catch
             {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
             }
         }
 
+        [AuthHeaderFilter]
         [HttpGet("{id}")]
         public async Task<ActionResult<string>> GetCartItem(int id)
         {
@@ -80,12 +83,13 @@ namespace ProductCatalogService.Controllers
 
             catch
             {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
             }
         }
 
+        [AuthHeaderFilter]
         [HttpPost]
-        public async Task<ActionResult<string>> AddItemToCart(AddToCartDto addToCartDto)
+        public async Task<ActionResult<string>> AddItemToCart(AddItemToCartDto addToCartDto)
         {
             try
             {
@@ -100,8 +104,6 @@ namespace ProductCatalogService.Controllers
 
                 // Retrieve cart items based on ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
-
-                Console.WriteLine($"OWNER ID 🤓: {ownerId}");
 
                 Cart cartFromDb = _unitOfWork.Cart.Get(u => u.OwnerId == ownerId && u.ProductId == addToCartDto.ProductId);
 
@@ -136,10 +138,11 @@ namespace ProductCatalogService.Controllers
             }
             catch
             {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
             }
         }
 
+        [AuthHeaderFilter]
         [HttpDelete("{id}")]
         public async Task<ActionResult<string>> DeleteItemFrom(int id)
         {
@@ -173,9 +176,11 @@ namespace ProductCatalogService.Controllers
             }
             catch
             {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
             }
         }
+
+        //HTTP CONNECTIONS FROM AUTHSERVICE
 
         [HttpGet(nameof(TestConnection))]
         public async Task<ActionResult<string>> TestConnection()
@@ -188,7 +193,7 @@ namespace ProductCatalogService.Controllers
             }
             catch
             {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
             }
         }
 
