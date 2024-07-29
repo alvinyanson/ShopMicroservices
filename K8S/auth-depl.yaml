@@ -15,7 +15,6 @@ spec:
       containers:
         - name: authservice
           image: ayansonarcanys/authservice:latest
-
 ---
 apiVersion: v1
 kind: Service
