@@ -9,12 +9,12 @@ namespace AuthService.Profiles
     {
         public AuthProfile()
         {
-            CreateMap<RegisterAccount, IdentityUser>()
+            CreateMap<Register, IdentityUser>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 
 
-            CreateMap<RegisterAccount, UserSignUpDto>();
+            CreateMap<Register, RegisterUserDto>();
         }
     }
 }

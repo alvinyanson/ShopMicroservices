@@ -2,17 +2,12 @@
 
 namespace AuthService.Models
 {
-    public class RegisterAccount
+    public class Login
     {
         [Required]
-        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         [Required]
-        [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        [Required]
-        public string Role { get; set; }
     }
 }

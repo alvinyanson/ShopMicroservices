@@ -1,7 +1,6 @@
 ﻿using AuthService.AsyncDataServices;
 using AuthService.Dtos;
 using AuthService.Models;
-using AuthService.Services;
 using AuthService.Services.Contracts;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -35,10 +34,10 @@ namespace AuthService.Controllers
         }
 
         [HttpPost(nameof(Login))]
-        public async Task<ActionResult> Login(LoginAccount account)
+        public async Task<ActionResult> Login(Login request)
         {
-            // Attemp to login
-            var loginResult = await _accountService.LoginAsync(account);
+            // Attempt to login
+            var loginResult = await _accountService.LoginAsync(request);
 
             if (!loginResult.Succeeded)
             {
@@ -48,7 +47,7 @@ namespace AuthService.Controllers
             try
             {
                 // Generate JWT token
-                string jwt = await GenerateJWT(account.Email);
+                string jwt = await GenerateJWT(request.Email);
 
                 // Success logged in
                 return Ok(new { success = true, message = "User logged in successfully!", result = jwt });
@@ -61,20 +60,20 @@ namespace AuthService.Controllers
         }
 
         [HttpPost(nameof(Register))]
-        public async Task<ActionResult<string>> Register(RegisterAccount account)
+        public async Task<ActionResult<string>> Register(Register request)
         {
             try
             {
                 // Check if email already exist in database
-                var existingUser = await _accountService.FindByEmailAsync(account.Email);
+                var existingUser = await _accountService.FindByEmailAsync(request.Email);
 
                 if(existingUser != null)
                 {
-                    return Ok(new { success = false, message = $"The email {account.Email} is already registered!" });
+                    return Ok(new { success = false, message = $"The email {request.Email} is already registered!" });
                 }
 
                 // Register the user
-                var registerResult = await _accountService.RegisterAsync(account);
+                var registerResult = await _accountService.RegisterAsync(request);
 
                 if (!registerResult.Succeeded)
                 {
@@ -82,10 +81,10 @@ namespace AuthService.Controllers
                 }
 
                 // Generate JWT token
-                string jwt = await GenerateJWT(account.Email);
+                string jwt = await GenerateJWT(request.Email);
 
                 // Async event AuthService -> ProductCatalogService (listen for new user, send a welcome email or special offers on ProductCatalogService)
-                var userSignUpDto = _mapper.Map<UserSignUpDto>(account);
+                var userSignUpDto = _mapper.Map<RegisterUserDto>(request);
                 _messageBusClient.UserSignUp(userSignUpDto);
 
                 // Success register
@@ -94,7 +93,7 @@ namespace AuthService.Controllers
 
             catch
             {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
             }
         }
 
@@ -137,7 +136,7 @@ namespace AuthService.Controllers
 
             catch
             {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
             }
         }
 
@@ -185,57 +184,8 @@ namespace AuthService.Controllers
 
             catch
             {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
             }
-        }
-
-        [HttpGet(nameof(GetProfile))]
-        public async Task<ActionResult> GetProfile(string email)
-        {
-            try
-            {
-                // Check if token is valid
-                string token = _httpContextHelper.GetTokenFromHeaders();
-                bool isValidToken = _jwtService.ValidateJwtToken(token);
-
-                if (string.IsNullOrEmpty(token) || !isValidToken)
-                {
-                    return Unauthorized();
-                }
-
-                // Find existing user
-                var existingUser = await _accountService.FindByEmailAsync(email);
-                if (existingUser == null)
-                {
-                    return NotFound(new { success = false, message = $"The user with email {email} does not exist!" });
-                }
-
-                // Success get profile
-                return Ok(new { success = true, message = "Profile retrieved!", result = existingUser });
-            }
-
-            catch
-            {
-                return StatusCode(500, new { success = false, message = $"Something went wrong!" });
-            }
-        }
-
-        [HttpGet(nameof(GetUserId))]
-        public ActionResult<string> GetUserId(string token)
-        {
-            string splitToken = token.ToString().Split(' ', 2)[1];
-
-            var handler = new JwtSecurityTokenHandler();
-
-            var jsonToken = handler.ReadJwtToken(splitToken);
-
-            if (jsonToken is null)
-            {
-                return Unauthorized();
-            }
-
-            string id = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? default!;
-            return id;
         }
 
         private async Task<string> GenerateJWT(string email)
@@ -256,8 +206,26 @@ namespace AuthService.Controllers
             return Ok(new { success = true, message = "Connection established" });
         }
 
-        [HttpGet(nameof(isTokenValid))]
-        public ActionResult<bool> isTokenValid(string token)
+        [HttpGet(nameof(GetUserId))]
+        public ActionResult<string> GetUserId(string token)
+        {
+            string splitToken = token.ToString().Split(' ', 2)[1];
+
+            var handler = new JwtSecurityTokenHandler();
+
+            var jsonToken = handler.ReadJwtToken(splitToken);
+
+            if (jsonToken is null)
+            {
+                return Unauthorized();
+            }
+
+            string id = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? default!;
+            return id;
+        }
+
+        [HttpGet(nameof(IsTokenValid))]
+        public ActionResult<bool> IsTokenValid(string token)
         {
             try
             {

@@ -6,11 +6,9 @@ namespace AuthService.Services.Contracts
 {
     public interface IAccountService
     {
-        Task<IdentityResult> RegisterAsync(RegisterAccount registerAccount);
+        Task<IdentityResult> RegisterAsync(Register registerAccount);
 
-        Task<SignInResult> LoginAsync(LoginAccount loginAccount);
-
-        Task<bool> IsSignedIn(ClaimsPrincipal claimsPrincipal);
+        Task<SignInResult> LoginAsync(Login loginAccount);
 
         Task<IdentityUser> FindByEmailAsync(string email);
 

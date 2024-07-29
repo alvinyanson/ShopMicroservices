@@ -32,7 +32,7 @@ namespace AuthService.AsyncDataServices
 
                 _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
 
-                Console.WriteLine("Connected to Message Bus");
+                Console.WriteLine("Connected to Message Bus...");
 
             }
             catch (Exception ex)
@@ -42,15 +42,15 @@ namespace AuthService.AsyncDataServices
             }
         }
 
-        public void UserSignUp(UserSignUpDto userSignUpDto)
+        public void UserSignUp(RegisterUserDto userSignUpDto)
         {
             var message = JsonSerializer.Serialize(userSignUpDto);
 
-            Console.WriteLine($"messagebus {message}");
+            Console.WriteLine($"User sign up: {message}");
 
             if (_connection.IsOpen)
             {
-                Console.WriteLine("RabbitMQ connection open, sending message...");
+                Console.WriteLine("RabbitMQ connection is open, sending message now...");
                 SendMessage(message);
             }
             else
@@ -65,7 +65,7 @@ namespace AuthService.AsyncDataServices
 
             _channel.BasicPublish(exchange: "trigger", routingKey: "", basicProperties: null, body: body);
 
-            Console.WriteLine($"We have sent {message}");
+            Console.WriteLine($"We have sent {message} to ProductCatalogService");
         }
 
         public void Dispose()

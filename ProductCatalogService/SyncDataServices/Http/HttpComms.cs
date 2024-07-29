@@ -31,7 +31,7 @@ namespace ProductCatalogService.SyncDataServices.Http
         {
             using (HttpClient client = new HttpClient())
             {
-                var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/isTokenValid?token={token}");
+                var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/IsTokenValid?token={token}");
 
                 if (response.IsSuccessStatusCode)
                 {

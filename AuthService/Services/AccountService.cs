@@ -1,5 +1,4 @@
-﻿using AuthService.Common;
-using AuthService.Models;
+﻿using AuthService.Models;
 using AuthService.Services.Contracts;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -28,19 +27,7 @@ namespace AuthService.Services
             _mapper = mapper;
         }
 
-        public async Task<bool> IsSignedIn(ClaimsPrincipal claimsPrincipal)
-        {
-            IdentityUser? identityUser = await _userManager.GetUserAsync(claimsPrincipal);
-
-            if (identityUser is null)
-            {
-                return false;
-            }
-
-            return _signInManager.IsSignedIn(claimsPrincipal);
-        }
-
-        public async Task<SignInResult> LoginAsync(LoginAccount loginAccount)
+        public async Task<SignInResult> LoginAsync(Login loginAccount)
         {
             return await _signInManager.PasswordSignInAsync(
                 loginAccount.Email,
@@ -49,7 +36,7 @@ namespace AuthService.Services
                 lockoutOnFailure: false);
         }
 
-        public async Task<IdentityResult> RegisterAsync(RegisterAccount registerAccount)
+        public async Task<IdentityResult> RegisterAsync(Register registerAccount)
         {
             var identityUser = _mapper.Map<IdentityUser>(registerAccount);
 
