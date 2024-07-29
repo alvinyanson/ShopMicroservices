@@ -1,5 +1,11 @@
 # .NET Microservices
 
+## Overview
+
+**AuthService** - Manages account-related operations, including login, password changes, and authentication.
+
+**ProductCatalogService** - Oversees all operations related to products, categories, and transactions.
+
 ## Clone the Repository
 
 Open your terminal and run the following command to clone the repository:
