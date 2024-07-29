@@ -39,7 +39,6 @@ In terminal, run the `AuthService`:
 Access the services on Postman:
 
     http://localhost:5174/api/Auth/Login
-    http://localhost:5174/api/Auth/Logout
     http://localhost:5174/api/Auth/Register
     http://localhost:5174/api/Auth/ChangePassword
     http://localhost:5174/api/Auth/ChangeEmailAndUsername
