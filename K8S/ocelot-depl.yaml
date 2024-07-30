@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocelot-depl
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ocelot-api-gateway
+  template:
+    metadata:
+      labels:
+        app: ocelot-api-gateway
+    spec:
+      containers:
+      - name: ocelot-api-gateway
+        image: ayansonarcanys/ocelotapigateway:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocelot-api-gateway-srv
+spec:
+  type: NodePort
+  selector:
+    app: ocelot-api-gateway
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
