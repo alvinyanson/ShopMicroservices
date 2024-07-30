@@ -1,5 +1,15 @@
 # .NET Microservices
-[Go to Task 5](#task-5---api-gateway-integration)
+
+## Contents
+- [Task 1 - Environment Setup](#task-1---environment-setup)
+- [Task 2 - Develop 2 Domain Specific Microservices](#task-2---develop-2-domain-specific-microservices)
+- [Task 3 - Persistence Layer Implementation](#task-3---persistence-layer-implementation)
+- [Task 4 - Kubernetes Deployment](#task-4---kubernetes-deployment)
+- [Task 5 - API Gateway Integration](#task-5---api-gateway-integration)
+- [Task 6 - Synchronous Communication](#task-6---synchronous-communication)
+- [Task 7 - Asynchronous Messaging with Event Bus](#task-7---asynchronous-messaging-with-event-bus)
+- [Screenshots for Client Web App](#client-web-app)
+
 ## Overview
 
 **AuthService** - Manages account-related operations, including login, password changes, and authentication.
