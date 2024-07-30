@@ -81,6 +81,11 @@ You can find the relevant data access operations under the `Controllers` directo
 
 After testing both microservices locally, we are now ready to deploy them on Kubernetes. Terminate any running microservice on your terminal. All YAML configuration files can be found under the `K8S/` directory.
 
+For reference, here are the docker images used in deployment.
+
+    https://hub.docker.com/r/ayansonarcanys/authservice
+    https://hub.docker.com/r/ayansonarcanys/productcatalog
+
 ### Auth Service Deployment
 
 In terminal, run the command:
