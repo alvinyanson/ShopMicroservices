@@ -16,6 +16,7 @@ namespace ProductCatalogService.SyncDataServices.Http
             using (HttpClient client = new HttpClient())
             {
                 var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/GetUserId?token={token}");
+                Console.WriteLine($"AuthService: {_configuration.GetConnectionString("AuthService")}");
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsStringAsync();
