@@ -207,6 +207,8 @@ Here's a sample log when a user registers. A message is sent from `AuthService` 
 
 ### API Gateway Deployment (Ingress Nginx)
 
+I will migrate this on Ocelot Framework once I have resolved the issues I am encountering with the framework.
+
 Ingress will act as a reverse proxy and load balancer, handling external traffic and routing it to our specified services.
 
 In terminal, run the following command:
