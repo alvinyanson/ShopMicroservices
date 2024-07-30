@@ -11,12 +11,12 @@ namespace ShopWebApp.Areas.Customer.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IMapper _mapper;
         private readonly IHttpServiceWrapper _productCatalogService;
+        private readonly IMapper _mapper;
 
         public HomeController(
-            IConfiguration config, 
             AuthService authService,
+            IConfiguration config,
             IMapper mapper)
         {
             _mapper = mapper;
@@ -30,11 +30,19 @@ namespace ShopWebApp.Areas.Customer.Controllers
 
             HttpResponseMessage? response = await _productCatalogService.GetAsync(HttpContext, "Products");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<ProductDto>>>(jsonResponse);
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<ReadProductDto>>>(jsonResponse);
 
-            return View(apiResponse.Result);
+                if (parsedResponse != null)
+                {
+                    return View(parsedResponse.Result);
+                }
+            }
+
+            return View();
         }
 
         [HttpGet]
@@ -42,18 +50,26 @@ namespace ShopWebApp.Areas.Customer.Controllers
         {
             HttpResponseMessage? response = await _productCatalogService.GetAsync(HttpContext, $"Products/{id}");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<ProductDto>>(jsonResponse);
-
-            Cart cart = new()
+            if (response != null && response.IsSuccessStatusCode)
             {
-                Product = apiResponse.Result,
-                Quantity = 1,
-                ProductId = id
-            };
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            return View(cart);
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<ReadProductDto>>(jsonResponse);
+
+                if (parsedResponse != null)
+                {
+                    Cart cart = new()
+                    {
+                        Product = parsedResponse.Result,
+                        Quantity = 1,
+                        ProductId = id
+                    };
+
+                    return View(cart);
+                }
+            }
+
+            return View();
         }
 
         [HttpPost]
@@ -63,12 +79,20 @@ namespace ShopWebApp.Areas.Customer.Controllers
             var item = _mapper.Map<AddItemToCartDto>(cart);
 
             HttpResponseMessage? response = await _productCatalogService.PostAsync(HttpContext, item, "Carts");
-            
-            var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            return RedirectToAction("Index");
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+
+                if (parsedResponse != null)
+                {
+                    TempData["success"] = parsedResponse.Message;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

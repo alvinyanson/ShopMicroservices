@@ -35,14 +35,26 @@ namespace ShopWebApp.Areas.Identity.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                await _authService.RefreshTokenAsync(HttpContext);
+                return RedirectToAction("Index", "Home", new { area = "Customer" });
+            }
+
             return View();
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                await _authService.RefreshTokenAsync(HttpContext);
+                return RedirectToAction("Index", "Home", new { area = "Customer" });
+            }
+
             return View(new RegisterVM());
         }
 
@@ -91,7 +103,7 @@ namespace ShopWebApp.Areas.Identity.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM request)
         {
-            var credentialsDto = _mapper.Map<RegisterDto>(request.Register);
+            var credentialsDto = _mapper.Map<RegisterUserDto>(request.Register);
             HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, credentialsDto, "Register");
 
             if (response == null)
@@ -143,6 +155,8 @@ namespace ShopWebApp.Areas.Identity.Controllers
                 return View(nameof(ChangeUsernameAndEmail));
             }
 
+            TempData["success"] = parsedResponse.Message;
+
             return RedirectToAction("Index", "Home", new { area = "Customer" });
         }
 
@@ -170,6 +184,8 @@ namespace ShopWebApp.Areas.Identity.Controllers
 
                 return View(nameof(ChangePassword));
             }
+
+            TempData["success"] = parsedResponse.Message;
 
             return RedirectToAction("Index", "Home", new { area = "Customer" });
         }

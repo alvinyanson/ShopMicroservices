@@ -11,13 +11,12 @@ namespace ShopWebApp.Areas.Admin.Controllers
 {
     public class CategoriesController : Controller
     {
-
-        private readonly IMapper _mapper;
         private readonly IHttpServiceWrapper _productCatalogService;
+        private readonly IMapper _mapper;
 
         public CategoriesController(
-            IConfiguration config,
             AuthService authService,
+            IConfiguration config,
             IMapper mapper)
         {
             _mapper = mapper;
@@ -29,32 +28,51 @@ namespace ShopWebApp.Areas.Admin.Controllers
         {
             HttpResponseMessage? response = await _productCatalogService.GetAsync(HttpContext, "Categories");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            if(response != null && response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<CategoryDto>>>(jsonResponse);
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<ReadCategoryDto>>>(jsonResponse);
 
-            return View(apiResponse.Result);
+                if(parsedResponse != null)
+                {
+                    return View(parsedResponse.Result);
+                }
+            }
+
+            return View();
         }
 
         [HttpGet]
         public async Task<IActionResult> Create(int? id)
         {
+            // Create category
             if (id == null || id == 0)
             {
                 return View(new Category());
             }
 
+
+            // Edit Category, retrieve category detail
             HttpResponseMessage? response = await _productCatalogService.GetAsync(HttpContext, $"Categories/{id}");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<CategoryDto>>(jsonResponse);
-
-            return View(new Category()
+            if(response != null && response.IsSuccessStatusCode)
             {
-                Id = apiResponse.Result.Id,
-                Name = apiResponse.Result.Name,
-            });
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<ReadCategoryDto>>(jsonResponse);
+
+                if(parsedResponse != null)
+                {
+                    return View(new Category()
+                    {
+                        Id = parsedResponse.Result.Id,
+                        Name = parsedResponse.Result.Name,
+                    });
+                }
+            }
+
+            return View(new Category());
         }
 
         [HttpPost]
@@ -62,13 +80,21 @@ namespace ShopWebApp.Areas.Admin.Controllers
         {
             HttpResponseMessage? response = await _productCatalogService.PostAsync(HttpContext, category, "Categories");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            if(response != null && response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
 
-            TempData["success"] = apiResponse.Message;
+                if (parsedResponse != null)
+                {
+                    TempData["success"] = parsedResponse.Message;
 
-            return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            return View();
         }
 
         [HttpDelete]
@@ -76,13 +102,21 @@ namespace ShopWebApp.Areas.Admin.Controllers
         {
             HttpResponseMessage? response = await _productCatalogService.DeleteAsync(HttpContext, $"Categories/{id}");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            if(response != null && response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
 
-            TempData["success"] = apiResponse.Message;
+                if(parsedResponse != null)
+                {
+                    TempData["success"] = parsedResponse.Message;
 
-            return Json(new { success = true, message = apiResponse.Message });
+                    return Json(new { success = true, message = parsedResponse.Message });
+                }
+            }
+
+            return View();
         }
     }
 }

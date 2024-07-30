@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using ShopWebApp.Dtos;
 
 namespace ShopWebApp.Models.ViewModels
 {

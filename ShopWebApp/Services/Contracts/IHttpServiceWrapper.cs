@@ -10,8 +10,5 @@
 
         Task<HttpResponseMessage?> DeleteAsync(HttpContext context, params string[] endpoints);
 
-        IHttpServiceWrapper AddParameter(string name, object value);
-
-        Task<bool> IsRunning();
     }
 }

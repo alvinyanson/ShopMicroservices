@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace ShopWebApp.Dtos
 {
-    public class CategoryDto
+    public class ReadCategoryDto
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }

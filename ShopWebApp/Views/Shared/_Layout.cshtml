@@ -43,14 +43,6 @@
 
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" && currentAction == "ChangeUsernameAndEmail" ? "active" : "")" asp-area="Identity" asp-controller="Auth" asp-action="ChangeUsernameAndEmail">Change  Email</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" && currentAction == "ChangePassword" ? "active" : "")" asp-area="Identity" asp-controller="Auth" asp-action="ChangePassword">Change Password</a>
-                            </li>
-
 
                             @if (User.IsInRole(nameof(Role.Admin)))
                             {
@@ -61,6 +53,16 @@
                                     <a class="nav-link @(currentArea == "Admin" && currentController == "Categories" ? "active" : "")" asp-area="Admin" asp-controller="Categories" asp-action="Index">Manage Categories</a>
                                 </li>
                             }
+
+                            <li class="nav-item" style="margin-left: auto">
+                                <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" && currentAction == "ChangeUsernameAndEmail" ? "active" : "")" asp-area="Identity" asp-controller="Auth" asp-action="ChangeUsernameAndEmail">Change  Email</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @(currentArea == "Identity" && currentController == "Auth" && currentAction == "ChangePassword" ? "active" : "")" asp-area="Identity" asp-controller="Auth" asp-action="ChangePassword">Change Password</a>
+                            </li>
+
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="Identity" asp-controller="Auth" asp-action="Logout">
                                     <i class="bi bi-box-arrow-right"></i> Logout @User.Identity.Name

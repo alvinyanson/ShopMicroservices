@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace ShopWebApp.Dtos
 {
-    public class CartDto
+    public class ReadCartItemsDto
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
@@ -14,7 +14,7 @@ namespace ShopWebApp.Dtos
         public int ProductId { get; set; }
 
         [JsonPropertyName("product")]
-        public ProductDto Product { get; set; }
+        public ReadProductDto Product { get; set; }
 
         [JsonPropertyName("quantity")]
         public int Quantity { get; set; }

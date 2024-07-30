@@ -9,7 +9,7 @@ namespace ShopWebApp.Profiles
         public ShopWebAppProfile()
         {
             CreateMap<Register, Login>();
-            CreateMap<Register, RegisterDto>();
+            CreateMap<Register, RegisterUserDto>();
 
 
             CreateMap<Cart, AddItemToCartDto>();

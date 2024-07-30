@@ -20,7 +20,7 @@ namespace ShopWebApp.Services
             _authService = authService;
         }
 
-        public virtual async Task<HttpResponseMessage?> GetAsync(HttpContext context, params string[] endpoints)
+        public async Task<HttpResponseMessage?> GetAsync(HttpContext context, params string[] endpoints)
         {
             string uri = $"{this}/{string.Join('/', endpoints)}";
 
@@ -48,7 +48,7 @@ namespace ShopWebApp.Services
             return default!;
         }
 
-        public virtual async Task<HttpResponseMessage?> PostAsync(HttpContext context, object content, params string[] endpoints)
+        public async Task<HttpResponseMessage?> PostAsync(HttpContext context, object content, params string[] endpoints)
         {
             var httpContent = new StringContent(
                 JsonSerializer.Serialize(content),
@@ -80,7 +80,7 @@ namespace ShopWebApp.Services
             return default!;
         }
 
-        public virtual async Task<HttpResponseMessage?> DeleteAsync(HttpContext context, params string[] endpoints)
+        public async Task<HttpResponseMessage?> DeleteAsync(HttpContext context, params string[] endpoints)
         {
             string uri = $"{this}/{string.Join('/', endpoints)}";
 
@@ -106,30 +106,6 @@ namespace ShopWebApp.Services
             }
 
             return default!;
-        }
-
-        public virtual IHttpServiceWrapper AddParameter(string name, object value)
-        {
-            var parameterizedService = new ParameterizedHttpService<T>(_config, _authService);
-            parameterizedService.AddParameter(name, value);
-
-            return parameterizedService;
-        }
-
-        public async Task<bool> IsRunning()
-        {
-            try
-            {
-                using (HttpClient client = new HttpClient())
-                using (HttpResponseMessage response = await client.GetAsync(ToString()))
-                {
-                    return response.IsSuccessStatusCode;
-                }
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         public override string ToString()

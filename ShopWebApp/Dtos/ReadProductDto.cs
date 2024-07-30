@@ -2,7 +2,7 @@
 
 namespace ShopWebApp.Dtos
 {
-    public class ProductDto
+    public class ReadProductDto
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
@@ -18,5 +18,9 @@ namespace ShopWebApp.Dtos
 
         [JsonPropertyName("price")]
         public double Price { get; set; }
+
+        [JsonPropertyName("categoryId")]
+        public int CategoryId { get; set; }
+
     }
 }

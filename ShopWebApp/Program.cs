@@ -68,11 +68,11 @@ using (var serviceScope = builder.Services.BuildServiceProvider().CreateScope())
         new HttpService<HttpProductCatalogService>(builder.Configuration, authService),
     };
 
-    foreach (var service in httpServices)
-    {
-        string serviceStatus = await service.IsRunning() ? "UP" : "DOWN";
-        Console.WriteLine($"\t{service.Service.NormalizedName} ({service}): {serviceStatus}");
-    }
+    //foreach (var service in httpServices)
+    //{
+    //    string serviceStatus = await service.IsRunning() ? "UP" : "DOWN";
+    //    Console.WriteLine($"\t{service.Service.NormalizedName} ({service}): {serviceStatus}");
+    //}
 }
 
 // Configure the HTTP request pipeline.

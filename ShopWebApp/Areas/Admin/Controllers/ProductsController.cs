@@ -7,16 +7,14 @@ using ShopWebApp.Dtos;
 using ShopWebApp.Models;
 using System.Text.Json;
 using ShopWebApp.Models.ViewModels;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ShopWebApp.Areas.Admin.Controllers
 {
     public class ProductsController : Controller
     {
-
-        private readonly IMapper _mapper;
         private readonly IHttpServiceWrapper _productCatalogService;
+        private readonly IMapper _mapper;
 
         public ProductsController(
             IConfiguration config,
@@ -32,58 +30,85 @@ namespace ShopWebApp.Areas.Admin.Controllers
         {
             HttpResponseMessage? response = await _productCatalogService.GetAsync(HttpContext, "Products");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<ProductDto>>>(jsonResponse);
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<ReadProductDto>>>(jsonResponse);
 
-            return View(apiResponse.Result);
+                if (parsedResponse != null)
+                {
+                    return View(parsedResponse.Result);
+                }
+            }
+
+            return View();
         }
 
         [HttpGet]
         public async Task<IActionResult> Create(int? id)
         {
+            // Get product categories
+            HttpResponseMessage? response = await _productCatalogService.GetAsync(HttpContext, "Categories");
 
-            HttpResponseMessage? response2 = await _productCatalogService.GetAsync(HttpContext, "Categories");
-
-            var jsonResponse2 = await response2.Content.ReadAsStringAsync();
-
-            var apiResponse2 = JsonSerializer.Deserialize<ApiResponse<IEnumerable<CategoryDto>>>(jsonResponse2);
-
-            if (id == null || id == 0)
+            if (response != null && response.IsSuccessStatusCode)
             {
-                return View(new ProductVM()
-                { 
-                    Product = new Product(),
-                    Categories = apiResponse2.Result.Select(u => new SelectListItem
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<ReadCategoryDto>>>(jsonResponse);
+
+                if (parsedResponse != null)
+                {
+                    // Create Form Product
+                    if (id == null || id == 0)
                     {
-                        Text = u.Name,
-                        Value = u.Id.ToString()
-                    })
-                });
+                        return View(new ProductVM()
+                        {
+                            Product = new Product(),
+                            Categories = parsedResponse.Result.Select(u => new SelectListItem
+                            {
+                                Text = u.Name,
+                                Value = u.Id.ToString()
+                            })
+                        });
+                    }
+
+                    // Edit Form Product, retrieve product info and seed the form
+                    HttpResponseMessage? response2 = await _productCatalogService.GetAsync(HttpContext, $"Products/{id}");
+
+                    if (response2 != null && response2.IsSuccessStatusCode)
+                    {
+                        var jsonResponse2 = await response2.Content.ReadAsStringAsync();
+
+                        var parsedResponse2 = JsonSerializer.Deserialize<ApiResponse<ReadProductDto>>(jsonResponse2);
+
+                        if (parsedResponse2 != null)
+                        {
+                            return View(new ProductVM()
+                            {
+                                Product = new Product()
+                                {
+                                    Id = parsedResponse2.Result.Id,
+                                    Name = parsedResponse2.Result.Name,
+                                    Description = parsedResponse2.Result.Description,
+                                    ImageUrl = parsedResponse2.Result.ImageUrl,
+                                    Price = parsedResponse2.Result.Price,
+                                    CategoryId = parsedResponse2.Result.CategoryId
+                                },
+                                Categories = parsedResponse.Result.Select(u => new SelectListItem
+                                {
+                                    Text = u.Name,
+                                    Value = u.Id.ToString()
+                                })
+                            });
+                        }
+                    }
+                }
+
+
             }
 
-            HttpResponseMessage? response = await _productCatalogService.GetAsync(HttpContext, $"Products/{id}");
-            
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<ProductDto>>(jsonResponse);
-
-            return View(new ProductVM()
-            {
-                Product = new Product()
-                {
-                    Id = apiResponse.Result.Id,
-                    Name = apiResponse.Result.Name,
-                    Description = apiResponse.Result.Description,
-                    ImageUrl = apiResponse.Result.ImageUrl,
-                    Price = apiResponse.Result.Price,
-                },
-                Categories = apiResponse2.Result.Select(u => new SelectListItem
-                {
-                    Text = u.Name,
-                    Value = u.Id.ToString()
-                })
-            });
+            return View(new ProductVM());
         }
 
 
@@ -92,13 +117,21 @@ namespace ShopWebApp.Areas.Admin.Controllers
         {
             HttpResponseMessage? response = await _productCatalogService.PostAsync(HttpContext, product, "Products");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
 
-            TempData["success"] = apiResponse.Message;
+                if (parsedResponse != null)
+                {
+                    TempData["success"] = parsedResponse.Message;
 
-            return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            return View();
         }
 
         [HttpDelete]
@@ -106,13 +139,21 @@ namespace ShopWebApp.Areas.Admin.Controllers
         {
             HttpResponseMessage? response = await _productCatalogService.DeleteAsync(HttpContext, $"Products/{id}");
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            if (response != null)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+                var parsedResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
 
-            TempData["success"] = apiResponse.Message;
+                if (parsedResponse != null)
+                {
+                    TempData["success"] = parsedResponse.Message;
 
-            return Json(new { success = true, message = apiResponse.Message });
+                    return Json(new { success = true, message = parsedResponse.Message });
+                }
+            }
+
+            return View();
         }
     }
 }
