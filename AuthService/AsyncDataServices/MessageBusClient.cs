@@ -32,7 +32,7 @@ namespace AuthService.AsyncDataServices
 
                 _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
 
-                Console.WriteLine("Connected to Message Bus...");
+                Console.WriteLine("Connected to Message Bus... 🔥🔥🔥");
 
             }
             catch (Exception ex)
@@ -65,7 +65,7 @@ namespace AuthService.AsyncDataServices
 
             _channel.BasicPublish(exchange: "trigger", routingKey: "", basicProperties: null, body: body);
 
-            Console.WriteLine($"We have sent {message} to ProductCatalogService");
+            Console.WriteLine($"We have sent {message} to ProductCatalogService 🔥🔥🔥");
         }
 
         public void Dispose()

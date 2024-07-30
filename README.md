@@ -221,12 +221,12 @@ Open the `ingress-srv.yaml file`. In the host property, I've configured the host
 
 
     AuthService
-      https://shopme.com/api/Auth
+      http://shopme.com/api/Auth
 
     ProductCatalogService
-      https://shopme.com/api/Products
-      https://shopme.com/api/Categories
-      https://shopme.com/api/Carts
+      http://shopme.com/api/Products
+      http://shopme.com/api/Categories
+      http://shopme.com/api/Carts
 
 
 ## Task 6 - Synchronous Communication

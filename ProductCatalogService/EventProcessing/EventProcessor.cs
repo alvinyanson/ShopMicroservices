@@ -22,7 +22,7 @@ namespace ProductCatalogService.EventProcessing
             switch (eventType)
             {
                 case EventType.Customer:
-                    Console.WriteLine($"User sign up! Now do something else here, maybe send welcome email.");
+                    Console.WriteLine($"User sign up! Now do something else here, maybe send welcome email. 🔥🔥🔥");
                     break;
 
                 default:

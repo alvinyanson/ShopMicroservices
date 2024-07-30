@@ -16,9 +16,15 @@ namespace ProductCatalogService.SyncDataServices.Http
             using (HttpClient client = new HttpClient())
             {
                 var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/GetUserId?token={token}");
-                Console.WriteLine($"AuthService: {_configuration.GetConnectionString("AuthService")}");
+                
                 if (response.IsSuccessStatusCode)
                 {
+                    Console.WriteLine($"HTTP Communication Here: ProductCatalogService -> AuthService 🔥🔥🔥");
+
+                    Console.WriteLine("Event: To retrieve ownerId of user from AuthService");
+
+                    Console.WriteLine($"AuthService URL: {_configuration.GetConnectionString("AuthService")}");
+
                     return await response.Content.ReadAsStringAsync();
                 }
 
@@ -34,6 +40,12 @@ namespace ProductCatalogService.SyncDataServices.Http
 
                 if (response.IsSuccessStatusCode)
                 {
+                    Console.WriteLine($"HTTP Communication Here: ProductCatalogService -> AuthService 🔥🔥🔥");
+
+                    Console.WriteLine("Event: To validate token of user from AuthService");
+
+                    Console.WriteLine($"AuthService URL: {_configuration.GetConnectionString("AuthService")}");
+
                     string result = await response.Content.ReadAsStringAsync();
                    
                     if(result != null)
@@ -55,9 +67,14 @@ namespace ProductCatalogService.SyncDataServices.Http
                 var response = await client.GetAsync($"{_configuration.GetConnectionString("AuthService")}/TestConnection");
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Http test connection works on AuthService");
-                    
+                    Console.WriteLine($"HTTP Communication Here: ProductCatalogService -> AuthService 🔥🔥🔥");
+
+                    Console.WriteLine("Event: To test connection from AuthService");
+
+                    Console.WriteLine($"AuthService URL: {_configuration.GetConnectionString("AuthService")}");
+
                     string message = await response.Content.ReadAsStringAsync();
+
                     return message;
                 }
 

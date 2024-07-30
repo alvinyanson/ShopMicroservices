@@ -203,7 +203,7 @@ namespace AuthService.Controllers
         [HttpGet(nameof(TestConnection))]
         public ActionResult<string> TestConnection()
         {
-            return Ok(new { success = true, message = "Connection established" });
+            return Ok(new { success = true, message = "Connection established... 🔥🔥🔥" });
         }
 
         [HttpGet(nameof(GetUserId))]

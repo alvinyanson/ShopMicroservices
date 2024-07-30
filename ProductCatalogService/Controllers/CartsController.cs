@@ -102,7 +102,7 @@ namespace ProductCatalogService.Controllers
                     return Unauthorized();
                 }
 
-                // Retrieve cart items based on ownerId
+                // HTTP Communication; Retrieve cart items based on ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
 
                 Cart cartFromDb = _unitOfWork.Cart.Get(u => u.OwnerId == ownerId && u.ProductId == addToCartDto.ProductId);
@@ -111,8 +111,6 @@ namespace ProductCatalogService.Controllers
                 if (cartFromDb != null)
                 {
                     cartFromDb.Quantity = addToCartDto.Quantity;
-
-                    Console.WriteLine($"quantity: {cartFromDb.Quantity}");
 
                     _unitOfWork.Cart.Update(cartFromDb);
 
@@ -174,6 +172,39 @@ namespace ProductCatalogService.Controllers
 
                 return Ok(new { success = true, message = "Item deleted from cart!" });
             }
+            catch
+            {
+                return StatusCode(500, new { success = false, message = "Something went wrong!" });
+            }
+        }
+
+        [AuthHeaderFilter]
+        [HttpGet(nameof(Checkout))]
+        public async Task<ActionResult<string>> Checkout()
+        {
+            try
+            {
+                // Check if token is valid
+                string token = _httpContextHelper.GetTokenFromHeaders();
+                bool isValidToken = await ValidateTokenFromAuthService(token);
+
+                if (string.IsNullOrEmpty(token) || !isValidToken)
+                {
+                    return Unauthorized();
+                }
+
+                // Retrieve cart items based on ownerId
+                string ownerId = await GetUserIdFromAuthService(token);
+
+                var cartFromDb = _unitOfWork.Cart.GetAll().Where(u => u.OwnerId == ownerId);
+
+                _unitOfWork.Cart.RemoveRange(cartFromDb);
+
+                _unitOfWork.Save();
+
+                return Ok(new { success = true, message = "Item checkout successfully!" });
+            }
+
             catch
             {
                 return StatusCode(500, new { success = false, message = "Something went wrong!" });

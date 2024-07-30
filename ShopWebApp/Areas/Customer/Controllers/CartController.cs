@@ -95,6 +95,13 @@ namespace ShopWebApp.Areas.Customer.Controllers
 
                 if (parsedResponse != null)
                 {
+
+                    if(parsedResponse.Result.Quantity <= 1)
+                    {
+                        await Remove(id);
+                        return RedirectToAction("Index");
+                    }
+
                     var item = new AddItemToCartDto()
                     {
                         ProductId = parsedResponse.Result.ProductId,
@@ -133,6 +140,30 @@ namespace ShopWebApp.Areas.Customer.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+
+        public async Task<IActionResult> Checkout()
+        {
+            HttpResponseMessage? response = await _productCatalogService.GetAsync(HttpContext, "Carts/Checkout");
+
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(jsonResponse);
+
+                if (apiResponse != null)
+                {
+                    TempData["success"] = apiResponse.Message;
+                }
+            }
+            else
+            {
+                TempData["error"] = "Something went wrong!";
+            }
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
