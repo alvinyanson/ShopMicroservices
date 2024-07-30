@@ -26,7 +26,7 @@ After cloning, open the solution the `ShopMicroservices.sln`
 
 ### Microservice 1 - AuthService
 
-#### Running the AuthService locally
+#### Running the AuthService locally without kubernetes
 
 Make sure you are in the AuthService directory. If not, run the following command in the terminal:
 
@@ -45,7 +45,7 @@ Access the services on Postman:
 
 ### Microservice 2 - ProductCatalogService
 
-#### Running the ProductCatalogService locally
+#### Running the ProductCatalogService locally without kubernetes
 
 Make sure you are in the ProductCatalogService directory. If not, run the following command in the terminal:
 
@@ -79,7 +79,7 @@ You can find the relevant data access operations under the `Controllers` directo
 
 ## Task 4 - Kubernetes Deployment
 
-All YAML configuration files can be found under the `K8S/` directory.
+After testing both microservices locally, we are now ready to deploy them on Kubernetes. Terminate any running microservice on your terminal. All YAML configuration files can be found under the `K8S/` directory.
 
 ### Auth Service Deployment
 
@@ -217,7 +217,22 @@ In our case, I've chosen to use Ingress Nginx as the API gateway for our microse
 
 Our configuration sets up routing rules for incoming HTTP traffic based on hostname and path prefixes, directing requests to specific services within the Kubernetes cluster.
 
-Open the `ingress-srv.yaml file`. In the host property, I've configured the hostname as `shopme.com`. All HTTP traffic from this hostname will be routed to the specified services.
+Open the `ingress-srv.yaml file`. In the host property, I've configured the hostname as `shopme.com`. All HTTP traffic from this hostname will be routed to the specified services. Take note that it is `http` and **NOT** `https`. We are skipping the HTTPS setup for now due to extra configs needed with `ingress-nginx`.
+
+Open the host file, locate this file on the following path below.
+
+    C:\Windows\System32\drivers\etc\hosts
+
+Add this line on the hosts file (Admin rights is required to modify this file, if prompted, just confirm.)
+
+    127.0.0.1 shopme.com
+
+
+**IMPORTANT NOTE:** 
+
+To make sure you can access the endpoints below, paste the endpoint `http://shopme.com/api/Products` on your browser. 
+
+In case you can't access it and you can only access thru `https` https://shopme.com/api/Products, I manage to resolve my issue following this Stackoverflow issue https://stackoverflow.com/a/64638891/6579258
 
 
     AuthService
@@ -279,3 +294,46 @@ In `AuthService` and `ProductCatalogService`, verify that you have the following
 
     "RabbitMQHost": "rabbitmq-clusterip-srv",
     "RabbitMQPort": "5672"
+
+
+
+## Client Web App
+
+**Product Listing**
+
+  ![ProductListing Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/localhost_5140_.png)
+
+
+**Cart**
+
+  ![Cart Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/localhost_5140_Customer_Cart%20(1).png)
+
+
+**Admin Manage Products**
+
+  ![AdminManageProducts Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/localhost_5140_Admin_Products.png)
+
+
+**Admin Manage Categories**
+
+  ![AdminManageCategories Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/localhost_5140_Admin_Categories.png)
+
+
+**Login**
+
+  ![Login Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/localhost_5140_Identity_Auth_LogIn.png)
+
+
+**Register**
+
+  ![Register Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/localhost_5140_Identity_Auth_Register.png)
+
+
+**Change Email and Username**
+
+  ![ChangeEmailAndUsername Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/localhost_5140_Identity_Auth_ChangeUsernameAndEmail.png)
+
+
+**Change Password**
+
+  ![ChangePassword Screenshot](https://raw.githubusercontent.com/alvinyanson/ShopMicroservices/master/Docs/localhost_5140_Identity_Auth_ChangePassword.png)
