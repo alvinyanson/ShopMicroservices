@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using CatalogService.Services;
 using Microsoft.AspNetCore.Mvc;
-using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Dtos;
 using ProductCatalogService.Models;
+using ProductCatalogService.Services.Contracts;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,12 +15,12 @@ namespace ProductCatalogService.Controllers
     public class CategoriesController : ControllerBase
     {
 
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
 
-        public CategoriesController(IUnitOfWork unitOfWork, IMapper mapper)
+        public CategoriesController(ICategoryService categoryService, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _categoryService = categoryService;
             _mapper = mapper;
         }
 
@@ -28,7 +28,7 @@ namespace ProductCatalogService.Controllers
         [HttpGet]
         public ActionResult<string> GetCategories()
         {
-            var result = _unitOfWork.Category.GetAll();
+            var result = _categoryService.GetAllCategories();
 
             return Ok(new { success = true, message = "Categories retrieved!", result });
         }
@@ -36,7 +36,7 @@ namespace ProductCatalogService.Controllers
         [HttpGet("{id}")]
         public ActionResult<string> GetCategory(int id)
         {
-            var result = _unitOfWork.Category.Get(u => u.Id == id);
+            var result = _categoryService.GetCategoryById(id);
 
             if (result == null)
             {
@@ -53,14 +53,12 @@ namespace ProductCatalogService.Controllers
 
             if (category.Id == 0)
             {
-                _unitOfWork.Category.Add(category);
+                _categoryService.AddCategory(category);
             }
             else
             {
-                _unitOfWork.Category.Update(category);
+                _categoryService.UpdateCategory(category);
             }
-
-            _unitOfWork.Save();
 
             return Ok(new { success = true, message = "Category saved!" });
         }
@@ -69,16 +67,14 @@ namespace ProductCatalogService.Controllers
         public ActionResult<string> Delete(int id)
         {
 
-            var result = _unitOfWork.Category.Get(u => u.Id == id);
+            var result = _categoryService.GetCategoryById(id);
 
             if (result == null)
             {
                 return NotFound(new { success = false, message = $"Category with id {id} does not exist!" });
             }
 
-            _unitOfWork.Category.Remove(id);
-
-            _unitOfWork.Save();
+            _categoryService.RemoveCategory(id);
 
             return Ok(new { success = true, message = "Category deleted!" });
         }

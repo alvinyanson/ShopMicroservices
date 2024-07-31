@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using CatalogService.Services;
 using Microsoft.AspNetCore.Mvc;
-using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Dtos;
 using ProductCatalogService.Models;
+using ProductCatalogService.Services.Contracts;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,19 +13,19 @@ namespace ProductCatalogService.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IProductService _productService;
         private readonly IMapper _mapper;
 
-        public ProductsController(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProductsController(IProductService productService, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _productService = productService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public ActionResult<string> GetProducts()
         {
-            var result = _unitOfWork.Product.GetAll();
+            var result = _productService.GetAllProducts();
 
             return Ok(new { success = true, message = "Products retrieved!", result });
         }
@@ -33,7 +33,7 @@ namespace ProductCatalogService.Controllers
         [HttpGet("{id}")]
         public ActionResult<string> GetProduct(int id)
         {
-            var result = _unitOfWork.Product.Get(u => u.Id == id);
+            var result = _productService.GetProductById(id);
 
             if(result == null)
             {
@@ -51,14 +51,12 @@ namespace ProductCatalogService.Controllers
 
             if(product.Id == 0)
             {
-                _unitOfWork.Product.Add(product);
+                _productService.AddProduct(product);
             }
             else
             {
-                _unitOfWork.Product.Update(product);
+                _productService.UpdateProduct(product);
             }
-
-            _unitOfWork.Save();
 
             return Ok(new { success = true, message = "Product saved!" });
         }
@@ -68,16 +66,14 @@ namespace ProductCatalogService.Controllers
         public ActionResult<string> Delete(int id)
         {
 
-            var result = _unitOfWork.Product.Get(u => u.Id == id);
+            var result = _productService.GetProductById(id);
 
             if(result == null)
             {
                 return NotFound(new { success = false, message = $"Product with id {id} does not exist!" });
             }
 
-            _unitOfWork.Product.Remove(id);
-
-            _unitOfWork.Save();
+            _productService.RemoveProduct(id);
 
             return Ok(new { success = true, message = "Product deleted!" });
         }

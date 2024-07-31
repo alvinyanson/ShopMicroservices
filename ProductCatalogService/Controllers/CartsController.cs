@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using CatalogService.Services;
 using Microsoft.AspNetCore.Mvc;
-using ProductCatalogService.Data.Repository.Contracts;
 using ProductCatalogService.Dtos;
 using ProductCatalogService.Models;
 using ProductCatalogService.Services.Contracts;
@@ -17,19 +16,19 @@ namespace ProductCatalogService.Controllers
     {
         private readonly IHttpContextHelper _httpContextHelper;
         private readonly IHttpComms _httpComms;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICartService _cartService;
 
         public CartsController(
             IHttpContextHelper httpContextHelper,
             IHttpComms httpComms,
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            ICartService cartService)
         {
             _httpContextHelper = httpContextHelper;
             _httpComms = httpComms;
-            _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cartService = cartService;
         }
 
         [AuthHeaderFilter]
@@ -50,7 +49,7 @@ namespace ProductCatalogService.Controllers
                 // Retrieve cart items based on ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
 
-                var cartItems = _unitOfWork.Cart.GetAll("Product").Where(u => u.OwnerId == ownerId);
+                var cartItems = _cartService.GetCartItemsByOwnerId(ownerId);
 
                 return Ok(new { success = true, message = "Cart items retrieved!", result = cartItems });
             }
@@ -76,9 +75,13 @@ namespace ProductCatalogService.Controllers
                     return Unauthorized();
                 }
 
-                var cartItem = _unitOfWork.Cart.Get(u => u.Id == id);
+                // Retrieve ownerId
+                string ownerId = await GetUserIdFromAuthService(token);
+                
+                // Retrieve cart item based on id and owner id
+                var cartFromDb = _cartService.GetCartItemByIdAndOwnerId(id, ownerId);
 
-                return Ok(new { success = true, message = "Cart item retrieved!", result = cartItem });
+                return Ok(new { success = true, message = "Cart item retrieved!", result = cartFromDb });
             }
 
             catch
@@ -105,16 +108,14 @@ namespace ProductCatalogService.Controllers
                 // HTTP Communication; Retrieve cart items based on ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
 
-                Cart cartFromDb = _unitOfWork.Cart.Get(u => u.OwnerId == ownerId && u.ProductId == addToCartDto.ProductId);
+                Cart cart = _cartService.GetCartItemByIdAndOwnerId(addToCartDto.ProductId, ownerId);
 
                 // Update item qty from cart if it's already existing product
-                if (cartFromDb != null)
+                if (cart != null)
                 {
-                    cartFromDb.Quantity = addToCartDto.Quantity;
+                    cart.Quantity = addToCartDto.Quantity;
 
-                    _unitOfWork.Cart.Update(cartFromDb);
-
-                    _unitOfWork.Save();
+                    _cartService.UpdateCartItem(cart);
 
                     return Ok(new { success = true, message = "Item updated from cart!" });
                 }
@@ -126,13 +127,10 @@ namespace ProductCatalogService.Controllers
 
                     var result = _mapper.Map<Cart>(addToCartDto);
 
-                    _unitOfWork.Cart.Add(result);
-
-                    _unitOfWork.Save();
+                    _cartService.AddCartItem(result);
 
                     return Ok(new { success = true, message = "Item added to cart!" });
                 }
-
             }
             catch
             {
@@ -142,7 +140,7 @@ namespace ProductCatalogService.Controllers
 
         [AuthHeaderFilter]
         [HttpDelete("{id}")]
-        public async Task<ActionResult<string>> DeleteItemFrom(int id)
+        public async Task<ActionResult<string>> RemoveCartItem(int id)
         {
             try
             {
@@ -155,20 +153,19 @@ namespace ProductCatalogService.Controllers
                     return Unauthorized();
                 }
 
-                // Retrieve cart items based on ownerId
+                // Retrieve ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
 
-                var cartFromDb = _unitOfWork.Cart.Get(u => u.OwnerId == ownerId && u.Id == id);
+                // Retrieve cart item based on id and owner id
+                var cart = _cartService.GetCartItemByIdAndOwnerId(id, ownerId);
 
-                if (cartFromDb == null)
+                if (cart == null)
                 {
                     return NotFound(new { success = false, message = "Item does not exist from cart!" });
                 }
 
                 // Remove item from cart
-                _unitOfWork.Cart.Remove(cartFromDb);
-
-                _unitOfWork.Save();
+                _cartService.RemoveCartItem(cart);
 
                 return Ok(new { success = true, message = "Item deleted from cart!" });
             }
@@ -196,11 +193,7 @@ namespace ProductCatalogService.Controllers
                 // Retrieve cart items based on ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
 
-                var cartFromDb = _unitOfWork.Cart.GetAll().Where(u => u.OwnerId == ownerId);
-
-                _unitOfWork.Cart.RemoveRange(cartFromDb);
-
-                _unitOfWork.Save();
+                _cartService.Checkout(ownerId);
 
                 return Ok(new { success = true, message = "Item checkout successfully!" });
             }

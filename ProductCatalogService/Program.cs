@@ -30,6 +30,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddTransient<IHttpComms, HttpComms>();
 builder.Services.AddTransient<IHttpContextHelper, HttpContextHelper>();
 builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
