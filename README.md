@@ -1,5 +1,15 @@
 # .NET Microservices
 
+## Contents
+- [Task 1 - Environment Setup](#task-1---environment-setup)
+- [Task 2 - Develop 2 Domain Specific Microservices](#task-2---develop-2-domain-specific-microservices)
+- [Task 3 - Persistence Layer Implementation](#task-3---persistence-layer-implementation)
+- [Task 4 - Kubernetes Deployment](#task-4---kubernetes-deployment)
+- [Task 5 - API Gateway Integration](#task-5---api-gateway-integration)
+- [Task 6 - Synchronous Communication](#task-6---synchronous-communication)
+- [Task 7 - Asynchronous Messaging with Event Bus](#task-7---asynchronous-messaging-with-event-bus)
+- [Screenshots for Client Web App](#client-web-app)
+
 ## Overview
 
 **AuthService** - Manages account-related operations, including login, password changes, and authentication.
@@ -80,6 +90,11 @@ You can find the relevant data access operations under the `Controllers` directo
 ## Task 4 - Kubernetes Deployment
 
 After testing both microservices locally, we are now ready to deploy them on Kubernetes. Terminate any running microservice on your terminal. All YAML configuration files can be found under the `K8S/` directory.
+
+For reference, here are the docker images used in deployment.
+
+    https://hub.docker.com/r/ayansonarcanys/authservice
+    https://hub.docker.com/r/ayansonarcanys/productcatalog
 
 ### Auth Service Deployment
 
@@ -191,6 +206,8 @@ Here's a sample log when a user registers. A message is sent from `AuthService` 
 
 
 ### API Gateway Deployment (Ingress Nginx)
+
+I will migrate this on Ocelot Framework once I have resolved the issues I am encountering with the framework.
 
 Ingress will act as a reverse proxy and load balancer, handling external traffic and routing it to our specified services.
 
