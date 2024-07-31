@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopWebApp.Services.Contracts;
 using ShopWebApp.Services.HttpClients;
@@ -8,6 +7,7 @@ using ShopWebApp.Models;
 using System.Text.Json;
 using ShopWebApp.Dtos;
 using ShopWebApp.Models.ViewModels;
+using Mapster;
 
 namespace ShopWebApp.Areas.Identity.Controllers
 {
@@ -17,16 +17,13 @@ namespace ShopWebApp.Areas.Identity.Controllers
 
         private readonly IHttpServiceWrapper _httpService;
         private readonly AuthService _authService;
-        private readonly IMapper _mapper;
 
         public AuthController(
             AuthService authService,
-            IConfiguration config,
-            IMapper mapper)
+            IConfiguration config)
         {
             _httpService = new HttpService<HttpAuthService>(config, authService);
             _authService = authService;
-            _mapper = mapper;
         }
 
         public IActionResult Index()
@@ -103,7 +100,7 @@ namespace ShopWebApp.Areas.Identity.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM request)
         {
-            var credentialsDto = _mapper.Map<RegisterUserDto>(request.Register);
+            var credentialsDto = request.Register.Adapt<RegisterUserDto>();
             HttpResponseMessage? response = await _httpService.PostAsync(HttpContext, credentialsDto, "Register");
 
             if (response == null)
@@ -126,8 +123,7 @@ namespace ShopWebApp.Areas.Identity.Controllers
                 return View(nameof(Register));
             }
 
-            return await Login(_mapper.Map<Login>(request.Register));
-
+            return await Login(request.Register.Adapt<Login>());
         }
 
         [HttpPost]

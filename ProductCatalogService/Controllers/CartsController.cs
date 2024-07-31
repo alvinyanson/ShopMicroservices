@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using CatalogService.Services;
+﻿using CatalogService.Services;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using ProductCatalogService.Dtos;
 using ProductCatalogService.Models;
@@ -16,18 +16,15 @@ namespace ProductCatalogService.Controllers
     {
         private readonly IHttpContextHelper _httpContextHelper;
         private readonly IHttpComms _httpComms;
-        private readonly IMapper _mapper;
         private readonly ICartService _cartService;
 
         public CartsController(
             IHttpContextHelper httpContextHelper,
             IHttpComms httpComms,
-            IMapper mapper,
             ICartService cartService)
         {
             _httpContextHelper = httpContextHelper;
             _httpComms = httpComms;
-            _mapper = mapper;
             _cartService = cartService;
         }
 
@@ -125,7 +122,7 @@ namespace ProductCatalogService.Controllers
                 {
                     addToCartDto.OwnerId = ownerId;
 
-                    var result = _mapper.Map<Cart>(addToCartDto);
+                    var result = addToCartDto.Adapt<Cart>();
 
                     _cartService.AddCartItem(result);
 

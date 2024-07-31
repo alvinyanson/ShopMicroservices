@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using ShopWebApp.Dtos;
 using ShopWebApp.Models;
@@ -12,14 +12,11 @@ namespace ShopWebApp.Areas.Customer.Controllers
     public class HomeController : Controller
     {
         private readonly IHttpServiceWrapper _productCatalogService;
-        private readonly IMapper _mapper;
 
         public HomeController(
             AuthService authService,
-            IConfiguration config,
-            IMapper mapper)
+            IConfiguration config)
         {
-            _mapper = mapper;
             _productCatalogService = new HttpService<HttpProductCatalogService>(config, authService);
         }
 
@@ -76,7 +73,7 @@ namespace ShopWebApp.Areas.Customer.Controllers
         public async Task<IActionResult> Details(Cart cart)
         {
 
-            var item = _mapper.Map<AddItemToCartDto>(cart);
+            var item = cart.Adapt<AddItemToCartDto>();
 
             HttpResponseMessage? response = await _productCatalogService.PostAsync(HttpContext, item, "Carts");
 

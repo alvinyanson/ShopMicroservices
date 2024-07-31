@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using CatalogService.Services;
+﻿using CatalogService.Services;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using ProductCatalogService.Dtos;
 using ProductCatalogService.Models;
@@ -16,12 +16,10 @@ namespace ProductCatalogService.Controllers
     {
 
         private readonly ICategoryService _categoryService;
-        private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryService categoryService, IMapper mapper)
+        public CategoriesController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
-            _mapper = mapper;
         }
 
 
@@ -49,7 +47,7 @@ namespace ProductCatalogService.Controllers
         [HttpPost]
         public ActionResult<string> CreateOrUpdateCategory(CreateCategoryDto request)
         {
-            var category = _mapper.Map<Category>(request);
+            var category = request.Adapt<Category>();
 
             if (category.Id == 0)
             {

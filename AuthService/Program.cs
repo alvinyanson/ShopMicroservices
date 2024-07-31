@@ -4,6 +4,7 @@ using AuthService.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AuthService.AsyncDataServices;
+using AuthService.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// auto mapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+// mapster
+builder.Services.RegisterMapsterConfiguration();
 
 // database context
 builder.Services.AddDbContext<AppDbContext>(options =>

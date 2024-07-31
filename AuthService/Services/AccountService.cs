@@ -1,6 +1,6 @@
 ﻿using AuthService.Models;
 using AuthService.Services.Contracts;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Security.Claims;
@@ -13,18 +13,15 @@ namespace AuthService.Services
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IMapper _mapper;
 
         public AccountService(
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            IMapper mapper)
+            RoleManager<IdentityRole> roleManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _roleManager = roleManager;
-            _mapper = mapper;
         }
 
         public async Task<SignInResult> LoginAsync(Login loginAccount)
@@ -38,7 +35,7 @@ namespace AuthService.Services
 
         public async Task<IdentityResult> RegisterAsync(Register registerAccount)
         {
-            var identityUser = _mapper.Map<IdentityUser>(registerAccount);
+            var identityUser = registerAccount.Adapt<IdentityUser>();
 
             var identityRole = new IdentityRole { Name = registerAccount.Role };
 

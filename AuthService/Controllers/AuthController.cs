@@ -2,7 +2,7 @@
 using AuthService.Dtos;
 using AuthService.Models;
 using AuthService.Services.Contracts;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,20 +17,17 @@ namespace AuthService.Controllers
         private readonly IMessageBusClient _messageBusClient;
         private readonly IAccountService _accountService;
         private readonly IJWTService _jwtService;
-        private readonly IMapper _mapper;
 
         public AuthController(
             IHttpContextHelper httpContextHelper,
             IMessageBusClient messageBusClient,
             IAccountService accountService, 
-            IJWTService jwtService,
-            IMapper mapper)
+            IJWTService jwtService)
         {
             _httpContextHelper = httpContextHelper;
             _messageBusClient = messageBusClient;
             _accountService = accountService;
             _jwtService = jwtService;
-            _mapper = mapper;
         }
 
         [HttpPost(nameof(Login))]
@@ -84,7 +81,8 @@ namespace AuthService.Controllers
                 string jwt = await GenerateJWT(request.Email);
 
                 // Async event AuthService -> ProductCatalogService (listen for new user, send a welcome email or special offers on ProductCatalogService)
-                var userSignUpDto = _mapper.Map<RegisterUserDto>(request);
+                var userSignUpDto = request.Adapt<RegisterUserDto>();
+
                 _messageBusClient.UserSignUp(userSignUpDto);
 
                 // Success register

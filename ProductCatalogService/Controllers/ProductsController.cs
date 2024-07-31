@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using CatalogService.Services;
+﻿using CatalogService.Services;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using ProductCatalogService.Dtos;
 using ProductCatalogService.Models;
@@ -14,12 +14,10 @@ namespace ProductCatalogService.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly IMapper _mapper;
 
-        public ProductsController(IProductService productService, IMapper mapper)
+        public ProductsController(IProductService productService)
         {
             _productService = productService;
-            _mapper = mapper;
         }
 
         [HttpGet]
@@ -35,7 +33,7 @@ namespace ProductCatalogService.Controllers
         {
             var result = _productService.GetProductById(id);
 
-            if(result == null)
+            if (result == null)
             {
                 return NotFound(new { success = false, message = $"Product with id {id} does not exist!" });
             }
@@ -47,9 +45,9 @@ namespace ProductCatalogService.Controllers
         [HttpPost]
         public ActionResult<string> CreateOrUpdateProduct(UpdateProductDto request)
         {
-            var product = _mapper.Map<Product>(request);
+            var product = request.Adapt<Product>();
 
-            if(product.Id == 0)
+            if (product.Id == 0)
             {
                 _productService.AddProduct(product);
             }
@@ -68,7 +66,7 @@ namespace ProductCatalogService.Controllers
 
             var result = _productService.GetProductById(id);
 
-            if(result == null)
+            if (result == null)
             {
                 return NotFound(new { success = false, message = $"Product with id {id} does not exist!" });
             }

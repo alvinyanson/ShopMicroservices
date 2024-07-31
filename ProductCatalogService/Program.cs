@@ -17,10 +17,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-// auto mapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 // database context
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopWebApp.Services.Contracts;
 using ShopWebApp.Services.HttpClients;
 using ShopWebApp.Services;
@@ -14,14 +13,11 @@ namespace ShopWebApp.Areas.Admin.Controllers
     public class ProductsController : Controller
     {
         private readonly IHttpServiceWrapper _productCatalogService;
-        private readonly IMapper _mapper;
 
         public ProductsController(
             IConfiguration config,
-            AuthService authService,
-            IMapper mapper)
+            AuthService authService)
         {
-            _mapper = mapper;
             _productCatalogService = new HttpService<HttpProductCatalogService>(config, authService);
         }
 

@@ -15,9 +15,6 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddTransient<AuthService>();
 
-// mapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 // auth
 builder.Services.AddAuthentication(options =>
 {
