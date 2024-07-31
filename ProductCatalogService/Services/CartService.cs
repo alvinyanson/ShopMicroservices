@@ -33,6 +33,11 @@ namespace ProductCatalogService.Services
             return _unitOfWork.Cart.Get(u => u.Id == id && u.OwnerId == ownerId);
         }
 
+        public Cart GetCartItemByProdIdAndOwnerId(int prodId, string ownerId)
+        {
+            return _unitOfWork.Cart.Get(u => u.ProductId == prodId && u.OwnerId == ownerId);
+        }
+
         public IEnumerable<Cart> GetCartItemsByOwnerId(string ownerId)
         {
             return _unitOfWork.Cart.GetAll("Product").Where(u => u.OwnerId == ownerId);

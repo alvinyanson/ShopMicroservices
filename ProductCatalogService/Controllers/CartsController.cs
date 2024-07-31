@@ -108,7 +108,7 @@ namespace ProductCatalogService.Controllers
                 // HTTP Communication; Retrieve cart items based on ownerId
                 string ownerId = await GetUserIdFromAuthService(token);
 
-                Cart cart = _cartService.GetCartItemByIdAndOwnerId(addToCartDto.ProductId, ownerId);
+                Cart cart = _cartService.GetCartItemByProdIdAndOwnerId(addToCartDto.ProductId, ownerId);
 
                 // Update item qty from cart if it's already existing product
                 if (cart != null)

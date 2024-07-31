@@ -9,6 +9,8 @@ namespace ProductCatalogService.Services.Contracts
       
         Cart GetCartItemByIdAndOwnerId(int id, string ownerId);
 
+        Cart GetCartItemByProdIdAndOwnerId(int prodId, string ownerId);
+
         void AddCartItem(Cart cart);
        
         void UpdateCartItem(Cart cart);
